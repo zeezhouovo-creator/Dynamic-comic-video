@@ -1,0 +1,28 @@
+{
+  "version": "0.1",
+  "project_id": "library",
+  "title": "雨中的归还",
+  "original_content": "当代中国南方小城，修书师林岚在旧图书馆整理旧书。她发现一本书夹着儿时写给母亲的纸条，伸手取出，轻轻笑了。窗外下着雨。",
+  "content_preservation": [
+    "中国南方小城与旧图书馆",
+    "纸条唤起母亲的记忆",
+    "克制温暖，不增加奇幻或日本文化元素"
+  ],
+  "setting": {
+    "place": "中国南方小城的旧图书馆",
+    "era": "当代",
+    "culture": "中国日常生活"
+  },
+  "visual_language": "日漫二维手绘线条、平涂阴影、纸面质感；仅作为视觉语言",
+  "tone": "安静、怀念、温暖",
+  "format": {
+    "width": 960,
+    "height": 540,
+    "fps": 24,
+    "duration_frames": 144
+  },
+  "assumptions": [
+    "示例故事为技能测试编写",
+    "V0.1 无声，硬切，三镜各两秒"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "task": "character_reference",
+  "identity": {
+    "face": "椭圆脸，细眉，深棕眼睛",
+    "hair": "黑色齐下巴短发，左侧一枚银色发夹",
+    "clothing": "米色长袖衬衫，靛蓝围裙",
+    "proportions": "成年女性，约七头身",
+    "distinctive_features": "左眼下小痣"
+  },
+  "prompt": "中性光线的正面、四分之三侧面和侧面身份参考；明确脸、发型、衣服和比例。姿势仅便于辨认，不作为镜头动作模板。",
+  "output": "characters/lin/reference.png",
+  "lock": "identity_only",
+  "visual_language": "日漫二维手绘线条、平涂阴影、纸面质感；仅作为视觉语言",
+  "setting": {
+    "place": "中国南方小城的旧图书馆",
+    "era": "当代",
+    "culture": "中国日常生活"
+  }
+}

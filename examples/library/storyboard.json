@@ -1,0 +1,167 @@
+{
+  "version": "0.1",
+  "project_id": "library",
+  "beats": [
+    {
+      "id": "b1",
+      "source_excerpt": "修书师林岚在旧图书馆整理旧书",
+      "change": "建立平静的日常",
+      "emotion": "平静"
+    },
+    {
+      "id": "b2",
+      "source_excerpt": "她发现一本书夹着儿时写给母亲的纸条，伸手取出",
+      "change": "意外发现让动作停顿",
+      "emotion": "惊讶"
+    },
+    {
+      "id": "b3",
+      "source_excerpt": "轻轻笑了",
+      "change": "从辨认转为温暖的回忆",
+      "emotion": "释然"
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot_001",
+      "beat_id": "b1",
+      "duration_frames": 48,
+      "purpose": "建立平静的日常",
+      "setting": "旧图书馆，阴雨日窗边",
+      "shot_size": "wide",
+      "angle": "eye_level",
+      "composition": "left_third 构图，视线引导到纸条，保留呼吸空间",
+      "composition_tag": "left_third",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "侧身俯向桌面，双手整理散开的旧书",
+          "pose_tag": "leaning_sort",
+          "expression": "专注",
+          "gaze": "旧书"
+        }
+      ],
+      "continuity": "人物衣着不变，窗光来自画面左侧，纸条不凭空消失",
+      "master": "shots/shot_001/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "书架、窗户、桌面，补全遮挡区域",
+          "method": "reconstruct",
+          "reason": "低速背景视差"
+        },
+        {
+          "id": "lin",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "本镜新动作的林岚及她手持的纸条",
+          "method": "extract",
+          "reason": "角色与背景分离"
+        },
+        {
+          "id": "fg",
+          "role": "foreground",
+          "elements": "前景桌角",
+          "method": "extract_or_reconstruct",
+          "reason": "前景增强景深"
+        }
+      ],
+      "repetition_exception": ""
+    },
+    {
+      "id": "shot_002",
+      "beat_id": "b2",
+      "duration_frames": 48,
+      "purpose": "意外发现让动作停顿",
+      "setting": "旧图书馆，阴雨日窗边",
+      "shot_size": "medium",
+      "angle": "high",
+      "composition": "diagonal 构图，视线引导到纸条，保留呼吸空间",
+      "composition_tag": "diagonal",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "上身前倾，右手从书页抽出纸条，左手压住书页",
+          "pose_tag": "reaching_note",
+          "expression": "微微惊讶",
+          "gaze": "纸条"
+        }
+      ],
+      "continuity": "人物衣着不变，窗光来自画面左侧，纸条不凭空消失",
+      "master": "shots/shot_002/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "书架、窗户、桌面，补全遮挡区域",
+          "method": "reconstruct",
+          "reason": "低速背景视差"
+        },
+        {
+          "id": "lin",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "本镜新动作的林岚及她手持的纸条",
+          "method": "extract",
+          "reason": "角色与背景分离"
+        },
+        {
+          "id": "fg",
+          "role": "foreground",
+          "elements": "前景桌角",
+          "method": "extract_or_reconstruct",
+          "reason": "前景增强景深"
+        }
+      ],
+      "repetition_exception": ""
+    },
+    {
+      "id": "shot_003",
+      "beat_id": "b3",
+      "duration_frames": 48,
+      "purpose": "从辨认转为温暖的回忆",
+      "setting": "旧图书馆，阴雨日窗边",
+      "shot_size": "close_up",
+      "angle": "eye_level",
+      "composition": "right_third 构图，视线引导到纸条，保留呼吸空间",
+      "composition_tag": "right_third",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "将纸条举在胸前，抬眼后露出轻微笑容",
+          "pose_tag": "holding_note",
+          "expression": "含蓄微笑",
+          "gaze": "纸条"
+        }
+      ],
+      "continuity": "人物衣着不变，窗光来自画面左侧，纸条不凭空消失",
+      "master": "shots/shot_003/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "书架、窗户、桌面，补全遮挡区域",
+          "method": "reconstruct",
+          "reason": "低速背景视差"
+        },
+        {
+          "id": "lin",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "本镜新动作的林岚及她手持的纸条",
+          "method": "extract",
+          "reason": "角色与背景分离"
+        },
+        {
+          "id": "fg",
+          "role": "foreground",
+          "elements": "近处书脊",
+          "method": "extract_or_reconstruct",
+          "reason": "前景增强景深"
+        }
+      ],
+      "repetition_exception": ""
+    }
+  ]
+}

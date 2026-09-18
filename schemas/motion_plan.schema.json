@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:manga-motion-video:motion_plan:0.1",
+  "title": "motion_plan",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "0.1"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset_mode": {
+      "enum": [
+        "fixture",
+        "production"
+      ]
+    },
+    "shots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "shot_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "start_frame": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "duration_frames": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "transition": {
+            "const": "cut"
+          },
+          "layers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "layer_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "asset": {
+                  "type": "string",
+                  "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"
+                },
+                "z": {
+                  "type": "integer"
+                },
+                "from": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    },
+                    "scale": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 1.3
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "scale"
+                  ],
+                  "additionalProperties": false
+                },
+                "to": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    },
+                    "scale": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 1.3
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "scale"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "layer_id",
+                "asset",
+                "z",
+                "from",
+                "to"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "review": {
+            "type": "object",
+            "properties": {
+              "master_alignment": {
+                "type": "boolean"
+              },
+              "background_completed": {
+                "type": "boolean"
+              },
+              "motion_bounds_checked": {
+                "type": "boolean"
+              },
+              "notes": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "master_alignment",
+              "background_completed",
+              "motion_bounds_checked",
+              "notes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "shot_id",
+          "start_frame",
+          "duration_frames",
+          "transition",
+          "layers",
+          "review"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "version",
+    "project_id",
+    "asset_mode",
+    "shots"
+  ],
+  "additionalProperties": false
+}

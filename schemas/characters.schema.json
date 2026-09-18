@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:manga-motion-video:characters:0.1",
+  "title": "characters",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "0.1"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "story_role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "identity": {
+            "type": "object",
+            "properties": {
+              "face": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hair": {
+                "type": "string",
+                "minLength": 1
+              },
+              "clothing": {
+                "type": "string",
+                "minLength": 1
+              },
+              "proportions": {
+                "type": "string",
+                "minLength": 1
+              },
+              "distinctive_features": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "face",
+              "hair",
+              "clothing",
+              "proportions",
+              "distinctive_features"
+            ],
+            "additionalProperties": false
+          },
+          "reference": {
+            "type": "object",
+            "properties": {
+              "image": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"
+              },
+              "status": {
+                "enum": [
+                  "planned",
+                  "ready"
+                ]
+              },
+              "locks": {
+                "const": "identity_only"
+              },
+              "prompt": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "image",
+              "status",
+              "locks",
+              "prompt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "story_role",
+          "identity",
+          "reference"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "version",
+    "project_id",
+    "characters"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,24 @@
+{
+  "version": "0.1",
+  "project_id": "library",
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林岚",
+      "story_role": "修书师，发现自己的旧纸条",
+      "identity": {
+        "face": "椭圆脸，细眉，深棕眼睛",
+        "hair": "黑色齐下巴短发，左侧一枚银色发夹",
+        "clothing": "米色长袖衬衫，靛蓝围裙",
+        "proportions": "成年女性，约七头身",
+        "distinctive_features": "左眼下小痣"
+      },
+      "reference": {
+        "image": "characters/lin/reference.png",
+        "status": "planned",
+        "locks": "identity_only",
+        "prompt": "中性光线的正面、四分之三侧面和侧面身份参考；明确脸、发型、衣服和比例。姿势仅便于辨认，不作为镜头动作模板。"
+      }
+    }
+  ]
+}

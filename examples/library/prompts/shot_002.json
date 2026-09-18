@@ -1,0 +1,94 @@
+{
+  "task": "fresh_master_composition",
+  "output": "shots/shot_002/master.png",
+  "canvas": {
+    "width": 960,
+    "height": 540,
+    "fps": 24,
+    "duration_frames": 144
+  },
+  "original_content": "当代中国南方小城，修书师林岚在旧图书馆整理旧书。她发现一本书夹着儿时写给母亲的纸条，伸手取出，轻轻笑了。窗外下着雨。",
+  "preserve": [
+    "中国南方小城与旧图书馆",
+    "纸条唤起母亲的记忆",
+    "克制温暖，不增加奇幻或日本文化元素"
+  ],
+  "setting": {
+    "place": "中国南方小城的旧图书馆",
+    "era": "当代",
+    "culture": "中国日常生活"
+  },
+  "visual_language": "日漫二维手绘线条、平涂阴影、纸面质感；仅作为视觉语言",
+  "beat": {
+    "id": "b2",
+    "source_excerpt": "她发现一本书夹着儿时写给母亲的纸条，伸手取出",
+    "change": "意外发现让动作停顿",
+    "emotion": "惊讶"
+  },
+  "shot": {
+    "id": "shot_002",
+    "beat_id": "b2",
+    "duration_frames": 48,
+    "purpose": "意外发现让动作停顿",
+    "setting": "旧图书馆，阴雨日窗边",
+    "shot_size": "medium",
+    "angle": "high",
+    "composition": "diagonal 构图，视线引导到纸条，保留呼吸空间",
+    "composition_tag": "diagonal",
+    "characters": [
+      {
+        "character_id": "lin",
+        "action": "上身前倾，右手从书页抽出纸条，左手压住书页",
+        "pose_tag": "reaching_note",
+        "expression": "微微惊讶",
+        "gaze": "纸条"
+      }
+    ],
+    "continuity": "人物衣着不变，窗光来自画面左侧，纸条不凭空消失",
+    "master": "shots/shot_002/master.png",
+    "layers": [
+      {
+        "id": "bg",
+        "role": "background",
+        "elements": "书架、窗户、桌面，补全遮挡区域",
+        "method": "reconstruct",
+        "reason": "低速背景视差"
+      },
+      {
+        "id": "lin",
+        "role": "character",
+        "character_id": "lin",
+        "elements": "本镜新动作的林岚及她手持的纸条",
+        "method": "extract",
+        "reason": "角色与背景分离"
+      },
+      {
+        "id": "fg",
+        "role": "foreground",
+        "elements": "前景桌角",
+        "method": "extract_or_reconstruct",
+        "reason": "前景增强景深"
+      }
+    ],
+    "repetition_exception": ""
+  },
+  "identity_references": [
+    {
+      "image": "characters/lin/reference.png",
+      "identity": {
+        "face": "椭圆脸，细眉，深棕眼睛",
+        "hair": "黑色齐下巴短发，左侧一枚银色发夹",
+        "clothing": "米色长袖衬衫，靛蓝围裙",
+        "proportions": "成年女性，约七头身",
+        "distinctive_features": "左眼下小痣"
+      },
+      "reference_scope": "face/hair/clothes/proportions only; do not copy pose or composition"
+    }
+  ],
+  "negative_constraints": [
+    "Do not change cultural setting into Japan",
+    "Do not paste or recycle a reference standing pose",
+    "No baked-in dialogue or captions"
+  ],
+  "layer_instruction": "Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers."
+}

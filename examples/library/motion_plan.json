@@ -1,0 +1,184 @@
+{
+  "version": "0.1",
+  "project_id": "library",
+  "asset_mode": "fixture",
+  "shots": [
+    {
+      "shot_id": "shot_001",
+      "start_frame": 0,
+      "duration_frames": 48,
+      "transition": "cut",
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_001/layers/bg.png",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -3,
+            "y": 0,
+            "scale": 1.08
+          }
+        },
+        {
+          "layer_id": "lin",
+          "asset": "shots/shot_001/layers/lin.png",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -7,
+            "y": 0,
+            "scale": 1.08
+          }
+        },
+        {
+          "layer_id": "fg",
+          "asset": "shots/shot_001/layers/fg.png",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -12,
+            "y": 0,
+            "scale": 1.08
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "测试素材；正式生产须检查并更新这三个字段。"
+      }
+    },
+    {
+      "shot_id": "shot_002",
+      "start_frame": 48,
+      "duration_frames": 48,
+      "transition": "cut",
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_002/layers/bg.png",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -3,
+            "y": 0,
+            "scale": 1.08
+          }
+        },
+        {
+          "layer_id": "lin",
+          "asset": "shots/shot_002/layers/lin.png",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -7,
+            "y": 0,
+            "scale": 1.08
+          }
+        },
+        {
+          "layer_id": "fg",
+          "asset": "shots/shot_002/layers/fg.png",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -12,
+            "y": 0,
+            "scale": 1.08
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "测试素材；正式生产须检查并更新这三个字段。"
+      }
+    },
+    {
+      "shot_id": "shot_003",
+      "start_frame": 96,
+      "duration_frames": 48,
+      "transition": "cut",
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_003/layers/bg.png",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -3,
+            "y": 0,
+            "scale": 1.08
+          }
+        },
+        {
+          "layer_id": "lin",
+          "asset": "shots/shot_003/layers/lin.png",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -7,
+            "y": 0,
+            "scale": 1.08
+          }
+        },
+        {
+          "layer_id": "fg",
+          "asset": "shots/shot_003/layers/fg.png",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1.06
+          },
+          "to": {
+            "x": -12,
+            "y": 0,
+            "scale": 1.08
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "测试素材；正式生产须检查并更新这三个字段。"
+      }
+    }
+  ]
+}

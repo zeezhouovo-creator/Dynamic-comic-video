@@ -1,0 +1,21 @@
+{
+  "name": "manga-motion-video-renderer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "studio": "remotion studio src/index.tsx --no-open",
+    "render": "remotion render src/index.tsx MangaMotion out/video.mp4 --codec=h264",
+    "still": "remotion still src/index.tsx MangaMotion out/check.png"
+  },
+  "dependencies": {
+    "remotion": "4.0.526",
+    "@remotion/cli": "4.0.526",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.0"
+  }
+}

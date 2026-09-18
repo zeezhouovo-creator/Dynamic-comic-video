@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:manga-motion-video:storyboard:0.1",
+  "title": "storyboard",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "0.1"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "beats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_excerpt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "change": {
+            "type": "string",
+            "minLength": 1
+          },
+          "emotion": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "source_excerpt",
+          "change",
+          "emotion"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "shots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "beat_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "duration_frames": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          },
+          "setting": {
+            "type": "string",
+            "minLength": 1
+          },
+          "shot_size": {
+            "enum": [
+              "extreme_wide",
+              "wide",
+              "medium",
+              "close_up",
+              "extreme_close_up"
+            ]
+          },
+          "angle": {
+            "enum": [
+              "eye_level",
+              "high",
+              "low",
+              "overhead"
+            ]
+          },
+          "composition": {
+            "type": "string",
+            "minLength": 1
+          },
+          "composition_tag": {
+            "enum": [
+              "center",
+              "left_third",
+              "right_third",
+              "diagonal",
+              "symmetrical"
+            ]
+          },
+          "characters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "character_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "action": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pose_tag": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expression": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "gaze": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "character_id",
+                "action",
+                "pose_tag",
+                "expression",
+                "gaze"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          },
+          "continuity": {
+            "type": "string",
+            "minLength": 1
+          },
+          "master": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"
+          },
+          "layers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "enum": [
+                    "background",
+                    "character",
+                    "foreground",
+                    "effects"
+                  ]
+                },
+                "character_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "elements": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "method": {
+                  "enum": [
+                    "reconstruct",
+                    "extract",
+                    "extract_or_reconstruct"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "id",
+                "role",
+                "elements",
+                "method",
+                "reason"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "repetition_exception": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "beat_id",
+          "duration_frames",
+          "purpose",
+          "setting",
+          "shot_size",
+          "angle",
+          "composition",
+          "composition_tag",
+          "characters",
+          "continuity",
+          "master",
+          "layers",
+          "repetition_exception"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "version",
+    "project_id",
+    "beats",
+    "shots"
+  ],
+  "additionalProperties": false
+}

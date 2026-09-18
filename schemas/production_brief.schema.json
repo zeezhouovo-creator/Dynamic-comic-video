@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:manga-motion-video:production_brief:0.1",
+  "title": "production_brief",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "0.1"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "original_content": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_preservation": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "setting": {
+      "type": "object",
+      "properties": {
+        "place": {
+          "type": "string",
+          "minLength": 1
+        },
+        "era": {
+          "type": "string",
+          "minLength": 1
+        },
+        "culture": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "place",
+        "era",
+        "culture"
+      ],
+      "additionalProperties": false
+    },
+    "visual_language": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tone": {
+      "type": "string",
+      "minLength": 1
+    },
+    "format": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "fps": {
+          "enum": [
+            24,
+            25,
+            30,
+            60
+          ]
+        },
+        "duration_frames": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "fps",
+        "duration_frames"
+      ],
+      "additionalProperties": false
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "version",
+    "project_id",
+    "title",
+    "original_content",
+    "content_preservation",
+    "setting",
+    "visual_language",
+    "tone",
+    "format",
+    "assumptions"
+  ],
+  "additionalProperties": false
+}

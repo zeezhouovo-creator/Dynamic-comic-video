@@ -21,7 +21,7 @@ class PipelineTests(unittest.TestCase):
         self.assertTrue(any('Unknown character' in x for x in validate(self.project)[1]))
     def test_unreviewed_production(self):
         self.edit('motion_plan',lambda d:d.update(asset_mode='production'))
-        self.assertTrue(any('review incomplete' in x for x in validate(self.project)[1]))
+        self.assertTrue(any('review incomplete' in x for x in validate(self.project,True)[1]))
     def test_repetition_report(self):
         def repeat(d):
             for s in d['shots']:

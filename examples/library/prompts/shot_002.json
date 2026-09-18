@@ -19,6 +19,8 @@
     "culture": "中国日常生活"
   },
   "visual_language": "日漫二维手绘线条、平涂阴影、纸面质感；仅作为视觉语言",
+  "style_preset": "paper-collage",
+  "style_addition": "Layered paper collage illustration, tactile cut-paper edges, subtle paper fibers and print grain, controlled registration offsets, soft contact shadows between layers, limited palette derived from the production brief, handmade but precise silhouettes, clear readable faces and objects. Treat every layer as a physical paper cutout; preserve a clean master composition before separation.",
   "beat": {
     "id": "b2",
     "source_excerpt": "她发现一本书夹着儿时写给母亲的纸条，伸手取出",
@@ -86,9 +88,15 @@
     }
   ],
   "negative_constraints": [
-    "Do not change cultural setting into Japan",
+    "Do not change cultural setting or topic",
     "Do not paste or recycle a reference standing pose",
-    "No baked-in dialogue or captions"
+    "No baked-in dialogue or captions",
+    "No glossy 3D plastic",
+    "no photorealistic surface",
+    "no random torn edges over faces or text",
+    "no independent lighting per layer",
+    "no unrelated scrapbook stickers",
+    "no theme or culture substitution"
   ],
   "layer_instruction": "Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers."
 }

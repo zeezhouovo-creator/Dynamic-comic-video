@@ -10,6 +10,7 @@ description: Turn original stories, scripts, lessons, explainers, or branded nar
 ## 不可丢失的创作约束
 
 - 视觉语言由用户或 brief 决定：可以是日漫二维手绘，也可以是写实插画、欧美动画、绘本、赛博朋克、历史复原、科普图解、品牌风格或其他指定方向。不要因为技能名称、示例或参考图擅自改变题材、文化、时代、行业、世界观或受众。
+- 可选 `style_preset: "paper-collage"` 借鉴纸片拼贴视频的画面语法：可见纸张边缘、轻微错位、纸纤维/印刷颗粒、分层投影、有限调色板和克制的 2.5D 景深。它是画风预设，不改变内容主题；未指定时使用 `custom` 并按 brief 的视觉语言执行。具体规则见 [纸片拼贴画风](references/paper-collage-style.md)。
 - 保留原文的地域、时代、人物关系、题材、因果、事实边界与情绪。缺失的关键设定先询问，其余假设写入 brief；不得把教育、商业、历史或现实主题自动改造成校园/日本/幻想故事。
 - Character Reference 只锁脸、发型、服装、比例和辨识特征。参考图中的姿势、表情、景别、光线、构图不锁定。每个人物镜头按剧情重新绘制表演；禁止反复粘贴一张固定立绘。
 - 先从原文提取 Narrative Beats（信息、行动或情绪的变化），再为每个 beat 设计一个或多个 Shots。不要按相同秒数或句子机械切镜。
@@ -26,7 +27,7 @@ description: Turn original stories, scripts, lessons, explainers, or branded nar
 6. **Motion Director**：根据叙事情绪填写 `motion_plan.json`，采用镜头内帧数与明确起止变换。先小幅视差；检查首/中/末帧、遮挡关系、边缘和补洞区域。通过目视复核后更新 review 字段。正式素材必须 `asset_mode: production`。
 7. **QC → Remotion → MP4**：运行素材校验、prepare、Remotion 渲染。复查所有切点前后帧和每镜首/中/末帧；报告测试/正式素材状态、时长、尺寸、遗留问题与输出位置。
 
-数据契约见 [契约说明](references/contracts.md) 与 `schemas/*.schema.json`；可执行步骤见 [运行指南](references/runbook.md)。`examples/library/` 只是一个中国南方小城图书馆的原创测试样例，用来示范“视觉语言不改变内容题材”，不是技能的主题限制。
+数据契约见 [契约说明](references/contracts.md) 与 `schemas/*.schema.json`；可执行步骤见 [运行指南](references/runbook.md)。可选画风见 [纸片拼贴画风](references/paper-collage-style.md)。`examples/library/` 只是一个中国南方小城图书馆的原创测试样例，用来示范“视觉语言不改变内容题材”，不是技能的主题限制。
 
 ## Repetition QC
 

@@ -112,10 +112,18 @@ def validate(project, assets=False):
 
 def compile_prompts(project,data):
     brief,chars,board=(data[n] for n in NAMES[:3]); lookup={c['id']:c for c in chars['characters']}
+    paper_style = brief.get('style_preset') == 'paper-collage'
+    style_addition = ('Layered paper collage illustration, tactile cut-paper edges, subtle paper fibers and print grain, '
+                      'controlled registration offsets, soft contact shadows between layers, limited palette derived from '
+                      'the production brief, handmade but precise silhouettes, clear readable faces and objects. Treat every '
+                      'layer as a physical paper cutout; preserve a clean master composition before separation.') if paper_style else ''
+    style_avoid = (['No glossy 3D plastic','no photorealistic surface','no random torn edges over faces or text',
+                    'no independent lighting per layer','no unrelated scrapbook stickers','no theme or culture substitution']
+                   if paper_style else [])
     for char in chars['characters']:
-        save(project/'prompts'/('reference_'+char['id']+'.json'),{'task':'character_reference','identity':char['identity'],'prompt':char['reference']['prompt'],'output':char['reference']['image'],'lock':'identity_only','visual_language':brief['visual_language'],'setting':brief['setting']})
+        save(project/'prompts'/('reference_'+char['id']+'.json'),{'task':'character_reference','identity':char['identity'],'prompt':char['reference']['prompt'],'output':char['reference']['image'],'lock':'identity_only','visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'setting':brief['setting']})
     for shot in board['shots']:
-        save(project/'prompts'/(shot['id']+'.json'),{'task':'fresh_master_composition','output':shot['master'],'canvas':brief['format'],'original_content':brief['original_content'],'preserve':brief['content_preservation'],'setting':brief['setting'],'visual_language':brief['visual_language'],'beat':next(b for b in board['beats'] if b['id']==shot['beat_id']),'shot':shot,'identity_references':[{'image':lookup[c['character_id']]['reference']['image'],'identity':lookup[c['character_id']]['identity'],'reference_scope':'face/hair/clothes/proportions only; do not copy pose or composition'} for c in shot['characters']],'negative_constraints':['Do not change cultural setting into Japan','Do not paste or recycle a reference standing pose','No baked-in dialogue or captions'],'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.'})
+        save(project/'prompts'/(shot['id']+'.json'),{'task':'fresh_master_composition','output':shot['master'],'canvas':brief['format'],'original_content':brief['original_content'],'preserve':brief['content_preservation'],'setting':brief['setting'],'visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'beat':next(b for b in board['beats'] if b['id']==shot['beat_id']),'shot':shot,'identity_references':[{'image':lookup[c['character_id']]['reference']['image'],'identity':lookup[c['character_id']]['identity'],'reference_scope':'face/hair/clothes/proportions only; do not copy pose or composition'} for c in shot['characters']],'negative_constraints':['Do not change cultural setting or topic','Do not paste or recycle a reference standing pose','No baked-in dialogue or captions']+style_avoid,'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.'})
 
 def main():
     parser=argparse.ArgumentParser()

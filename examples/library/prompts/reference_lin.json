@@ -11,6 +11,8 @@
   "output": "characters/lin/reference.png",
   "lock": "identity_only",
   "visual_language": "日漫二维手绘线条、平涂阴影、纸面质感；仅作为视觉语言",
+  "style_preset": "paper-collage",
+  "style_addition": "Layered paper collage illustration, tactile cut-paper edges, subtle paper fibers and print grain, controlled registration offsets, soft contact shadows between layers, limited palette derived from the production brief, handmade but precise silhouettes, clear readable faces and objects. Treat every layer as a physical paper cutout; preserve a clean master composition before separation.",
   "setting": {
     "place": "中国南方小城的旧图书馆",
     "era": "当代",

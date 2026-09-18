@@ -43,15 +43,15 @@ jobs:
       - name: Build local test assets
         run: python scripts/make_fixture.py examples/library
       - name: Prepare renderer
-        run: python scripts/pipeline.py prepare examples/library --renderer ../manga-renderer
+        run: python scripts/pipeline.py prepare examples/library --renderer manga-renderer
       - name: Install renderer dependencies
-        working-directory: ../manga-renderer
+        working-directory: manga-renderer
         run: npm ci
       - name: Render fixture MP4
-        working-directory: ../manga-renderer
+        working-directory: manga-renderer
         run: npm run render
       - uses: actions/upload-artifact@v4
         with:
           name: manga-motion-video-fixture
-          path: ../manga-renderer/out/video.mp4
+          path: manga-renderer/out/video.mp4
           if-no-files-found: error

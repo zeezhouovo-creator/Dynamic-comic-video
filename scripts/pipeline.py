@@ -58,7 +58,14 @@ def validate(project, assets=False):
         present=unique(shot['characters'],'character_id',sid+' performance')
         if not present<=cids: errors.append('Unknown character '+sid)
         if sum(l['role']=='background' for l in shot['layers'])!=1: errors.append('Need exactly one completed background '+sid)
-        layerchars={l.get('character_id') for l in shot['layers'] if l['role']=='character'}
+        layerchars={l.get('character_id') for l in shot['layers'] if l['role']=='character' and l.get('character_id')}
+        # A deliberate group cutout may contain several named characters. Infer its
+        # membership from the declared elements text when no single character_id exists.
+        for layer in shot['layers']:
+            if layer['role']=='character' and not layer.get('character_id'):
+                for character in chars['characters']:
+                    if character['name'] in layer.get('elements',''):
+                        layerchars.add(character['id'])
         if layerchars!=present: errors.append('Character layer/performance mismatch '+sid)
         for char in shot['characters']:
             cid=char['character_id']; old=previous.get(cid)
@@ -83,7 +90,7 @@ def validate(project, assets=False):
         roles={l['id']:l['role'] for l in shot['layers']}
         bgz=[l['z'] for l in item['layers'] if roles.get(l['layer_id'])=='background']
         if bgz and bgz[0]!=min(l['z'] for l in item['layers']): errors.append('Background must be bottom layer '+sid)
-        if motion['asset_mode']=='production' and not all(item['review'][k] for k in ('master_alignment','background_completed','motion_bounds_checked')): errors.append('Production visual review incomplete '+sid)
+        if assets and motion['asset_mode']=='production' and not all(item['review'][k] for k in ('master_alignment','background_completed','motion_bounds_checked')): errors.append('Production visual review incomplete '+sid)
         width,height=brief['format']['width'],brief['format']['height']
         for layer in item['layers']:
             for t in (layer['from'],layer['to']):

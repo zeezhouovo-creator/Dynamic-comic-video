@@ -6,6 +6,8 @@
 
 项目也提供可选的 `paper-collage` 画风预设，借鉴纸片分层视频的视觉语法：纸张边缘、轻微套印错位、纸纤维与印刷颗粒、分层投影、有限调色板和克制的 2.5D 景深。这个预设只改变表现形式，不改变内容主题；未选择时不会自动套用。
 
+这是一个生成技能仓库，不是用户内容仓库。每次用户提供的故事、角色、参考图、master、图层和成片都应在独立的本地工作目录中生成；`projects/` 已被 Git 忽略，不会自动提交或上传。仓库只保存通用流程、Schema、提示词规则、渲染模板和无关具体用户故事的测试夹具。
+
 ## V0.1 已实现
 
 - `production_brief.json`、`characters.json`、`storyboard.json`、`motion_plan.json` 的严格 Schema 与跨文件检查。
@@ -33,7 +35,7 @@ npm ci
 npm run render
 ```
 
-示例使用本地几何测试素材，验证数据、透明层、视差和 MP4 管线；它不是某种主题的成片。正式项目需要按 `SKILL.md` 与 `references/layer-protocol.md` 生成并检查真实 master 和分层素材。
+示例使用本地几何测试素材，验证数据、透明层、视差和 MP4 管线；它不是某种主题的成片。正式项目需要按 `SKILL.md`、`references/content-intake.md` 与 `references/layer-protocol.md` 在独立工作目录中生成并检查真实 master 和分层素材。
 
 ## 目录
 

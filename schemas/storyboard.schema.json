@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:manga-motion-video:storyboard:0.1",
+  "$id": "urn:dynamic-comic-video:storyboard:0.1",
   "title": "storyboard",
   "type": "object",
   "properties": {

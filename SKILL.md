@@ -1,9 +1,9 @@
 ---
-name: manga-motion-video
+name: dynamic-comic-video
 description: Turn original stories, scripts, lessons, explainers, or branded narratives into layered motion-video sequences using identity-only character references, narrative beats, fresh shot compositions, master-aligned layers and Remotion MP4 rendering. Manga-style drawing is optional; use for topic-agnostic narrative motion video, not full frame-by-frame animation or lip sync.
 ---
 
-# Manga Motion Video — V0.1
+# Dynamic Comic Video — V0.1
 
 把用户原创内容转为可追溯的分镜、逐镜新绘的 master、对齐图层和 Remotion MP4。内容可以是现实故事、历史、科普、教育、产品说明、品牌叙事、幻想或其他用户指定主题。V0.1 的最小闭环是 Agent 编导与图像工具协作，加本地确定性校验和渲染；不是无需图像工具的自动绘制服务。
 
@@ -41,7 +41,7 @@ description: Turn original stories, scripts, lessons, explainers, or branded nar
 ## 项目布局
 
 ```text
-manga-motion-video/             保留此名称以兼容现有调用；能力面向各种主题
+dynamic-comic-video/            技能正式名称；能力面向各种主题
   SKILL.md
   schemas/                 四份严格 JSON Schema (2020-12)
   examples/library/        一个主题样例；测试素材、提示词与 QC 报告

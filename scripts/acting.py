@@ -1,6 +1,7 @@
 """Finite animation validation; transforms alone cannot prove convincing acting."""
 def asset_names(layer):
-    return list(dict.fromkeys([layer['asset']]+[p['asset'] for p in layer.get('acting',{}).get('poses',[])]))
+    a=layer.get('acting',{}); speech=a.get('speech',{})
+    return list(dict.fromkeys([layer['asset']]+[p['asset'] for p in a.get('poses',[])]+[speech[k] for k in ('closed_asset','open_asset') if k in speech]))
 
 def check_acting(shot, production, assets, roles):
     errors=[]; active=False
@@ -21,8 +22,14 @@ def check_acting(shot, production, assets, roles):
                 errors.append('Invalid acting frames '+sid+'/'+layer['layer_id'])
         changing=len({(k['x'],k['y'],k['rotation'],k['opacity']) for k in keys})>1
         pose_change=len({p['asset'] for p in poses})>1
+        speech=a.get('speech')
+        if speech:
+            if poses: errors.append('Speech and explicit poses cannot share one mouth track '+sid)
+            if a['part']!='mouth' or speech['closed_asset']==speech['open_asset']:
+                errors.append('Speech requires mouth part and distinct assets '+sid)
+            else: active=True
         if fixed:
-            if roles.get(layer['layer_id'])=='background' and (pose_change or any(k['x'] or k['y'] or k['rotation'] or k['opacity']!=1 for k in keys)):
+            if roles.get(layer['layer_id']) in ('background','panel_base') and (speech or pose_change or any(k['x'] or k['y'] or k['rotation'] or k['opacity']!=1 for k in keys)):
                 errors.append('Fixed-camera background must remain unchanged '+sid)
             if micro and any(abs(k['rotation'])>2 for k in keys):
                 errors.append('Micro acting rotation exceeds 2 degrees '+sid+'/'+layer['layer_id'])

@@ -1,9 +1,9 @@
 ---
 name: dynamic-comic-video
-description: Turn original stories, scripts, lessons, explainers, or branded narratives into layered motion-video sequences using identity-only character references, narrative beats, fresh shot compositions, master-aligned layers and Remotion MP4 rendering. Manga-style drawing is optional; use for topic-agnostic narrative motion video, not full frame-by-frame animation or lip sync.
+description: Create fixed-panel sequential comic videos from original stories, lessons or explainers, with identity-consistent fresh panels, local character acting, timed dialogue and captions, simple speech-driven mouth movement and Remotion MP4 rendering. Topic-agnostic; not full frame-by-frame animation or phoneme lip sync.
 ---
 
-# Dynamic Comic Video — V0.2
+# Dynamic Comic Video — V0.3 candidate
 
 把用户当次提供的原创内容转为可追溯的分镜、逐镜新绘的 master、对齐图层和 Remotion MP4。内容可以是现实故事、历史、科普、教育、产品说明、品牌叙事、幻想或其他用户指定主题。V0.1 的最小闭环是 Agent 编导与图像工具协作，加本地确定性校验和渲染；不是无需图像工具的自动绘制服务。
 
@@ -23,16 +23,20 @@ Skill 仓库保存能力，不保存用户作品。每次任务先在独立工�
 
 ## 工作流程与交付
 
-默认视频形式为 [连续分镜式动态漫画](references/sequential-comic.md)，使用 `performance.mode: sequential-comic`。以独立漫画分镜为单位，固定构图，人物表演，一句对白、一个动作或反应完成后直接切下一格。字幕跟随对白时间。能通过下一张漫画分镜表达的动作，不设计复杂连续动画。普通对白用漫画式表演；笑点允许夸张表情、符号、文字特效和突变。跨镜锁定发型、五官、服装、体型和整体画风。此默认模式禁用视差及镜头推拉、平移、旋转、缩放，优先于上文一般有限动画建议。主题可变，表现形式保持统一。
+**分镜生成统一执行 [分镜生成主规则](references/storyboard-director.md)，已替换原来的五项简表和通用分镜建议。**先建立场景空间记录，再独立设计每镜的背景视图、角色表演、倾听反应及切镜因果。跨镜保持空间与角色身份，禁止机械复用背景；镜内固定机位。每镜输出用户指定的13项字段，对白后按叙事需要留反应时间。旧文中的立即切镜和配角静止建议不作为本模式通用规则。
+
+V0.3 候选制作流程见 [对白时间轴、素材与逐镜重做](references/v03-production.md)：支持本地配音、字幕与音量驱动的简单嘴部开合，素材缺项报告、单镜编译/渲染，以及固定 master 的局部表情替换。发布正式 V0.3 前，必须通过真实3—5镜样片验收；不能只凭夹具测试通过命名正式成片。
+
+默认视频形式为 [连续分镜式动态漫画](references/sequential-comic.md)，使用 `performance.mode: sequential-comic`。独立漫画分镜、固定构图、人物表演；台词和动作后按剧情保留短暂反应，再硬切下一格。字幕跟随对白时间。复杂动作优先拆为下一张分镜。情绪重点允许漫画式夸张，日常对白保持克制。跨镜锁定角色身份与场景空间，背景构图随机位重新绘制。此模式禁用视差及镜头推拉、平移、旋转、缩放，优先于一般有限动画建议。主题可变，表现形式统一。
 
 用户要求原始漫画“活起来”、固定构图或克制微动作时，采用 [固定机位微动作](references/fixed-camera-micro.md)，填写 `performance.mode: fixed-camera-micro`。已有漫画直接作为 master，保留其原始姿势和构图；此时逐镜新绘规则仅适用于缺失的局部动作素材，不要求重新设计已有画面。禁止镜头推拉、缩放、平移、旋转和视差。保留二维线条、身份、服装与背景，围绕眨眼、说话、呼吸和轻微摆动设计动作。
 
 1. **Visual / Production Brief**：保存原文、内容保留项、文化时空、视觉语言、情绪和尺寸/帧率/总帧数为 `production_brief.json`。
 2. **Character Planning → Reference**：建立 `characters.json`，选择需要保持一致的角色，写 identity 与身份参考提示词。使用可用图像工具生成 reference 并目视核对，再设 `status: ready`。无人物项目允许空列表。不要为了凑人物改写原文。
-3. **Narrative Beats → Storyboard Director**：在 `storyboard.json` 先写 beats 的原文摘录与变化，再写 shots；每镜明确目的、人物动作/表情/视线、景别、角度、构图、连续性与拟分层理由。无意义的 foreground/effects 不拆。
+3. **Narrative Beats → Storyboard Director**：先写 scenes 空间锚点与 beats 的原文摘录/变化，再按主规则写独立 shots 和 direction。角色身份一致、场景空间连续、背景构图随机位自然变化；明确说话与倾听表演、台词时间、微动态、切镜原因与下一镜衔接。编译输出13项逐镜审阅稿。无意义的 foreground/effects 不拆。
 4. **Shot Prompt Compiler**：运行 `compile`，得到角色参考与逐镜 master 的结构化提示词。编译只整理已完成的导演决策，不创造新剧情。把 reference 作为身份参考输入图像工具，执行逐镜新绘，保存指定 `master.png`。
 5. **Master QC → Layer Planning**：先核对 master 的身份、剧情表演、构图与重复性，再确认该镜实际所需图层。根据 [分层协议](references/layer-protocol.md) 提取人物、补全背景、分离前景/特效，保存透明 PNG 与合成预览。若图像工具无法分层，明确缺少的资产并停在这一阶段；不要悄悄降级为整图推拉。
-6. **Motion Director**：使用 motion_plan 0.2，先填写动作意图，安排准备、动作、反应、停顿，再决定所需局部层或新绘姿态。按对白阅读速度和表演分配时长，不把格数当成秒数。编译器输出逐镜 acting 提示词。检查全部关键帧及中间帧的接缝、接触、遮挡、文字和节奏，确认后填写 performance.reviewed。素材生成失败时保存进度并明确缺图，禁止擅自降级为固定立绘推拉。
+6. **Motion Director**：新项目使用 motion_plan 0.3，先填写动作意图，安排准备、动作、反应、停顿，再决定所需局部层或新绘姿态。按实际对白音频和表演分配时长，不把格数当成秒数。编译器输出逐镜 acting 提示词。先用 preview 渲染，检查全部关键帧及中间帧的接缝、接触、遮挡、文字和节奏，确认后填写 performance.reviewed，再设 production。素材生成失败时保存进度并明确缺图，禁止擅自降级为固定立绘推拉。
 7. **QC → Remotion → MP4**：运行素材校验、prepare、Remotion 渲染。复查所有切点前后帧和每镜首/中/末帧；报告测试/正式素材状态、时长、尺寸、遗留问题与输出位置。
 
 数据契约见 [契约说明](references/contracts.md) 与 `schemas/*.schema.json`；可执行步骤见 [运行指南](references/runbook.md)。可选画风见 [纸片拼贴画风](references/paper-collage-style.md)。`examples/library/` 只是一个中国南方小城图书馆的原创测试样例，用来示范“视觉语言不改变内容题材”，不是技能的主题限制。

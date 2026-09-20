@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "version": {
-      "enum": ["0.1", "0.2"]
+      "enum": ["0.1", "0.2", "0.3"]
     },
     "project_id": {
       "type": "string",
@@ -14,6 +14,7 @@
     "asset_mode": {
       "enum": [
         "fixture",
+        "preview",
         "production"
       ]
     },
@@ -58,6 +59,7 @@
                   "minLength": 1
                 },
                 "acting": {"$ref": "#/$defs/acting"},
+                "region": {"type":"array","items":{"type":"number","minimum":0,"maximum":1},"minItems":4,"maxItems":4},
                 "asset": {
                   "type": "string",
                   "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"
@@ -172,6 +174,15 @@
       "type": "object",
       "properties": {
         "part": {"enum": ["whole", "head", "arm", "hand", "eyes", "mouth", "prop", "interface"]},
+        "speech": {
+          "type":"object",
+          "properties":{
+            "speaker":{"type":"string","minLength":1},
+            "closed_asset":{"type":"string","pattern":"^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"},
+            "open_asset":{"type":"string","pattern":"^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"}
+          },
+          "required":["speaker","closed_asset","open_asset"],"additionalProperties":false
+        },
         "pivot": {"type": "array", "items": {"type": "number", "minimum": 0, "maximum": 1}, "minItems": 2, "maxItems": 2},
         "keys": {
           "type": "array", "minItems": 2,

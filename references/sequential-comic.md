@@ -4,23 +4,17 @@
 
 每格构图固定，人物通过嘴部、眨眼、表情、偏头、手部和简单肢体动作表演。禁止镜头推近、拉远、平移、旋转、缩放以及整图拉伸替代人物运动。普通对白自然；吐槽、笑点可突变表情，增加漫画符号、文字特效，或直接切夸张反应画面。夸张不能破坏身份一致性。旧的 fixed-camera-micro 是用户明确要求极轻动作时的选项；其单次眨眼、配角静止、±2°限制不套用到普通喜剧分镜。
 
-## 五项分镜说明
+## 分镜生成与审阅
 
-compile 输出工作目录中的 storyboard_review.md，每格必须明确：
+分镜生成规则已统一替换为 [分镜生成主规则](storyboard-director.md)。compile 输出工作目录中的 storyboard_review.md，每格使用13项格式：镜头编号、持续时间、景别、机位/构图、场景背景、出场人物、人物动作、人物表情/视线、台词、字幕出现时机、微动态、切镜原因、下一镜头衔接。
 
-- 【画面】：storyboard 的 setting、composition，配合景别与角度。
-- 【人物动作/表情】：characters[].action、expression；无人物时写场景变化。
-- 【台词/字幕】：dialogue；无对白明确写空数组。
-- 【持续时间】：duration_frames / brief.format.fps。
-- 【切换方式】：transition 固定为 cut。
-
-motion_plan 使用版本 0.2 与 performance.mode=sequential-comic；storyboard 版本仍为 0.1（增加可选字段供旧项目兼容），本模式强制要求 dialogue 和 transition。
+新项目 motion_plan 使用版本0.3与 performance.mode=sequential-comic；storyboard 版本仍为0.1，须提供 scenes、每镜 direction、dialogue、transition。无对白填空数组。旧版0.2可读，迁移0.3需补齐独立分镜设计，不能自动填空套模板。
 
 ```json
 {"transition":"cut","dialogue":[{"speaker":"char_01","text":"请核对消息来源。","start_frame":6,"end_frame":54}]}
 ```
 
-时间相对当前分镜，单位帧，start 含、end 不含；例子需要该镜至少54帧。字幕逐条按对白出现，禁止超出本镜或互相重叠。真人配音/生成语音存在时按实际对白定时；只有文本时先提供估计时长并标记待配音对齐，不能声称已经语音同步。对白结束即切下一镜；仅在反应/笑点/阅读确有需要时在 purpose 说明短暂停顿，不机械添加空白。
+时间相对当前分镜，单位帧，start 含、end 不含；例子需要该镜至少54帧。字幕逐条按对白出现，禁止超出本镜或互相重叠。按实际配音定时；只有文本时标记估计时序预演。对白结束后按剧情保留 reaction_hold_frames，完成反应后硬切下一镜，不机械添加空白，也不强制立即切镜。
 
 所有图层 from/to 为 {"x":0,"y":0,"scale":1}，背景不动。人物用现有 acting 局部轨道/对齐图片序列表演；字幕由 Remotion 独立叠加，不能烘焙进角色参考或 master。嘴型仍需要局部素材和已标注时间，不自动生成音素口型。字幕基础渲染已支持，漫画符号及复杂文字特效需另制 effects 图层，不能声称已自动生成。
 

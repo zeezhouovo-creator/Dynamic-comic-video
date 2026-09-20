@@ -40,9 +40,9 @@ def check_acting(shot, production, assets, roles):
         # they must not be used as an always-on sine/cosine-style loop.
         if len(keys)>=6:
             values=[(k['x'],k['y'],k['rotation'],k['opacity']) for k in keys]
-            alternating=(values[0]==values[2]==values[4] and values[1]==values[3]==values[5])
+            alternating=all(values[i]==values[i-2] for i in range(2,len(values)))
             returning=(values[0]==values[-1] and values[1]==values[-2] and values[2]==values[-3])
-            if (alternating or returning) and len(set(values))>2:
+            if (alternating or returning) and len(set(values))>1:
                 errors.append('Periodic acting loop is not allowed; return to a stable hold '+sid+'/'+layer['layer_id'])
         if speech:
             if poses: errors.append('Speech and explicit poses cannot share one mouth track '+sid)

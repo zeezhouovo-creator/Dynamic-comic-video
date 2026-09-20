@@ -6,7 +6,7 @@
 
 ## 分镜生成与审阅
 
-分镜生成规则已统一替换为 [分镜生成主规则](storyboard-director.md)。compile 输出工作目录中的 storyboard_review.md，每格使用13项格式：镜头编号、持续时间、景别、机位/构图、场景背景、出场人物、人物动作、人物表情/视线、台词、字幕出现时机、微动态、切镜原因、下一镜头衔接。
+分镜生成规则已统一替换为 [分镜生成主规则](storyboard-director.md)。compile 输出工作目录中的 storyboard_review.md，每格使用17项格式：镜头编号、来源漫画格、持续时间、景别、机位/构图、场景、出场人物、当前说话者、人物动作、人物表情、人物视线、台词、字幕出现时机、微动态、音效、切镜原因、下一镜头衔接。
 
 新项目 motion_plan 使用版本0.3与 performance.mode=sequential-comic；storyboard 版本仍为0.1，须提供 scenes、每镜 direction、dialogue、transition。无对白填空数组。旧版0.2可读，迁移0.3需补齐独立分镜设计，不能自动填空套模板。
 

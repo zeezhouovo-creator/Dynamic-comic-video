@@ -17,6 +17,7 @@ def build_dialogue(root):
         w.writeframes(b''.join(struct.pack('<h',int(4500*math.sin(i*math.tau*220/24000)) if i%12000<8000 else 0) for i in range(36000)))
     motion['version']='0.3'
     for i,(s,m) in enumerate(zip(board['shots'],motion['shots'])):
+        s['source_panel']=f'panel_{i+1:02d}'
         s['direction']={'scene_id':'test-room','camera_position':['front','window side','shelf side'][i],
             'background_view':['window and shelf','window detail','shelf detail'][i],'view_id':f'view_{i}',
             'incoming_state':'Robot receives the cue','outgoing_state':'Robot finishes the test gesture',

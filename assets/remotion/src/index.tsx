@@ -1,11 +1,17 @@
 import React from 'react';
 import {AbsoluteFill, Composition, Img, Sequence, interpolate, registerRoot, staticFile, useCurrentFrame} from 'remotion';
-import data from './render-data.json';
+import input from './render-data.json';
+type Key={frame:number;x:number;y:number;rotation:number;opacity:number};
+type Layer={layer_id:string;asset:string;z:number;from:{x:number;y:number;scale:number};to:{x:number;y:number;scale:number};acting?:{part:string;pivot:[number,number];keys:Key[];poses?:{frame:number;asset:string}[]}};
+const data=input as {format:{width:number;height:number;fps:number;duration_frames:number};asset_mode:string;shots:{shot_id:string;start_frame:number;duration_frames:number;layers:Layer[]}[]};
 const Shot = ({shot}: {shot: typeof data.shots[number]}) => {
   const frame = useCurrentFrame();
   return <AbsoluteFill style={{overflow:'hidden'}}>{[...shot.layers].sort((a,b)=>a.z-b.z).map(layer => {
     const value = (key: 'x'|'y'|'scale') => interpolate(frame,[0,shot.duration_frames-1],[layer.from[key],layer.to[key]],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
-    return <Img key={layer.layer_id} src={staticFile(layer.asset)} style={{position:'absolute',width:'100%',height:'100%',transformOrigin:'50% 50%',transform:`translate(${value('x')}px, ${value('y')}px) scale(${value('scale')})`}}/>;
+    const a=layer.acting;
+    const local=(key:'x'|'y'|'rotation'|'opacity',fallback:number)=>a?interpolate(frame,a.keys.map(k=>k.frame),a.keys.map(k=>k[key]),{extrapolateLeft:'clamp',extrapolateRight:'clamp'}):fallback;
+    const pose=a?.poses?.filter(p=>p.frame<=frame).at(-1)?.asset ?? layer.asset;
+    return <AbsoluteFill key={layer.layer_id} style={{transformOrigin:'50% 50%',transform:`translate(${value('x')}px, ${value('y')}px) scale(${value('scale')})`}}><Img src={staticFile(pose)} style={{width:'100%',height:'100%',opacity:local('opacity',1),transformOrigin:a?`${a.pivot[0]*100}% ${a.pivot[1]*100}%`:'50% 50%',transform:`translate(${local('x',0)}px, ${local('y',0)}px) rotate(${local('rotation',0)}deg)`}}/></AbsoluteFill>;
   })}{data.asset_mode==='fixture' && <div style={{position:'absolute',left:24,bottom:20,color:'white',background:'#172332',padding:'8px 14px',fontSize:18,fontFamily:'sans-serif'}}>PIPELINE FIXTURE · {shot.shot_id} · NOT FINAL ART</div>}</AbsoluteFill>;
 };
 const Video = () => <AbsoluteFill style={{background:'#172332'}}>{data.shots.map(shot=><Sequence key={shot.shot_id} from={shot.start_frame} durationInFrames={shot.duration_frames}><Shot shot={shot}/></Sequence>)}</AbsoluteFill>;

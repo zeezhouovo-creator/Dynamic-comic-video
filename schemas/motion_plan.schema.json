@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "version": {
-      "const": "0.1"
+      "enum": ["0.1", "0.2"]
     },
     "project_id": {
       "type": "string",
@@ -25,6 +25,16 @@
           "shot_id": {
             "type": "string",
             "minLength": 1
+          },
+          "performance": {
+            "type": "object",
+            "properties": {
+              "intent": {"type": "string", "minLength": 1},
+              "static_reason": {"type": "string", "minLength": 1},
+              "reviewed": {"type": "boolean"}
+            },
+            "required": ["intent", "reviewed"],
+            "additionalProperties": false
           },
           "start_frame": {
             "type": "integer",
@@ -46,6 +56,7 @@
                   "type": "string",
                   "minLength": 1
                 },
+                "acting": {"$ref": "#/$defs/acting"},
                 "asset": {
                   "type": "string",
                   "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"
@@ -154,5 +165,38 @@
     "asset_mode",
     "shots"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "acting": {
+      "type": "object",
+      "properties": {
+        "part": {"enum": ["whole", "head", "arm", "hand", "eyes", "mouth", "prop", "interface"]},
+        "pivot": {"type": "array", "items": {"type": "number", "minimum": 0, "maximum": 1}, "minItems": 2, "maxItems": 2},
+        "keys": {
+          "type": "array", "minItems": 2,
+          "items": {
+            "type": "object",
+            "properties": {
+              "frame": {"type": "integer", "minimum": 0},
+              "x": {"type": "number"}, "y": {"type": "number"},
+              "rotation": {"type": "number", "minimum": -180, "maximum": 180},
+              "opacity": {"type": "number", "minimum": 0, "maximum": 1}
+            },
+            "required": ["frame", "x", "y", "rotation", "opacity"], "additionalProperties": false
+          }
+        },
+        "poses": {
+          "type": "array", "minItems": 2,
+          "items": {
+            "type": "object",
+            "properties": {
+              "frame": {"type": "integer", "minimum": 0},
+              "asset": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"}
+            }, "required": ["frame", "asset"], "additionalProperties": false
+          }
+        }
+      },
+      "required": ["part", "pivot", "keys"], "additionalProperties": false
+    }
+  }
 }

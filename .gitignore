@@ -9,6 +9,8 @@ out/
 
 # Generated runtime material; source fixture assets under examples/ are retained.
 renderer/
+manga-renderer/
+acting-fixture/
 
 # User-provided stories and generated content stay outside Git.
 projects/

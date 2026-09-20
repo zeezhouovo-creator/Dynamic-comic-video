@@ -8,14 +8,17 @@
 
 这是一个生成技能仓库，不是用户内容仓库。每次用户提供的故事、角色、参考图、master、图层和成片都应在独立的本地工作目录中生成；`projects/` 已被 Git 忽略，不会自动提交或上传。仓库只保存通用流程、Schema、提示词规则、渲染模板和无关具体用户故事的测试夹具。
 
-## V0.1 已实现
+## V0.2 已实现
 
 - `production_brief.json`、`characters.json`、`storyboard.json`、`motion_plan.json` 的严格 Schema 与跨文件检查。
 - Narrative Beats 先于 Shots 的分镜工作流。
 - “完整 master → 对齐提取/重建图层”的图层协议，包含背景补全要求。
 - pose、景别、角度、构图标签的重复预警，以及重复人物 PNG 的阻断检查。
-- Remotion 的基础硬切、推拉与 2.5D 视差输出。
+- Remotion 局部部件平移、关节旋转、透明度关键帧，以及对齐姿态图片切换；硬切和视差作为辅助。
+- 动作意图与静止理由校验，阻止纯推拉冒充角色表演。真实动作质量仍须目视复核。
 - 不含口型、配音、音乐、骨骼绑定或完整逐帧动画。
+
+新制作使用 motion_plan 0.2，其他合同保持 0.1。见 [有限动画协议](references/limited-animation.md)。旧 library 示例保留为视差回归测试；运行 `python scripts/make_acting_fixture.py ../acting-fixture` 生成固定相机下的通用抬臂/眨眼测试，再用 prepare 与 Remotion 渲染。它验证执行能力，不代表正式美术质量。
 
 ## 快速验证
 

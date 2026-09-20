@@ -1,4 +1,4 @@
-name: Verify V0.1 pipeline
+name: Verify V0.2 pipeline
 
 on:
   push:
@@ -41,9 +41,9 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install -r requirements.txt
       - name: Build local test assets
-        run: python scripts/make_fixture.py examples/library
+        run: python scripts/make_acting_fixture.py acting-fixture
       - name: Prepare renderer
-        run: python scripts/pipeline.py prepare examples/library --renderer manga-renderer
+        run: python scripts/pipeline.py prepare acting-fixture --renderer manga-renderer
       - name: Install renderer dependencies
         working-directory: manga-renderer
         run: npm ci

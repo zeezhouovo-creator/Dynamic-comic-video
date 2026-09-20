@@ -39,4 +39,28 @@ class PipelineTests(unittest.TestCase):
         self.edit('motion_plan',lambda d:d['shots'][0]['layers'][0].update(asset='../secret.png'))
         self.assertTrue(validate(self.project)[1])
 
+class ActingTests(PipelineTests):
+    def setUp(self):
+        from make_acting_fixture import build
+        self.temp=tempfile.TemporaryDirectory()
+        self.project=build(Path(self.temp.name)/'project')
+    # Keep legacy fixture-specific checks in PipelineTests.
+    def test_reused_cutout(self):
+        shutil.copy2(self.project/'shots/shot_001/layers/arm.png',self.project/'shots/shot_002/layers/arm.png')
+        self.assertTrue(any('Reused character cutout' in x for x in validate(self.project,True)[1]))
+    def test_missing_performance(self):
+        self.edit('motion_plan',lambda d:d['shots'][0].pop('performance'))
+        self.assertTrue(any('Missing performance' in x for x in validate(self.project)[1]))
+    def test_camera_only(self):
+        self.edit('motion_plan',lambda d:[l.pop('acting',None) for l in d['shots'][0]['layers']])
+        self.assertTrue(any('Camera-only' in x for x in validate(self.project)[1]))
+        self.edit('motion_plan',lambda d:d['shots'][0]['performance'].update(static_reason='Pause for reading'))
+        self.assertEqual(validate(self.project)[1],[])
+    def test_invalid_key_time(self):
+        self.edit('motion_plan',lambda d:d['shots'][0]['layers'][2]['acting']['keys'][-1].update(frame=48))
+        self.assertTrue(any('Invalid acting frames' in x for x in validate(self.project)[1]))
+    def test_missing_pose_asset(self):
+        (self.project/'shots/shot_001/layers/blink.png').unlink()
+        self.assertTrue(validate(self.project,True)[1])
+
 if __name__=='__main__': unittest.main()

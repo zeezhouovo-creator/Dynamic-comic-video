@@ -7,6 +7,7 @@ import shutil
 import sys
 from jsonschema import Draft202012Validator
 from PIL import Image
+from acting import asset_names, check_acting
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = ('production_brief', 'characters', 'storyboard', 'motion_plan')
@@ -88,6 +89,10 @@ def validate(project, assets=False):
         if lids!={l['id'] for l in shot['layers']}: errors.append('Layer set mismatch '+sid)
         unique(item['layers'],'z',sid+' z order')
         roles={l['id']:l['role'] for l in shot['layers']}
+        if motion['version']=='0.2':
+            errors.extend(check_acting(item,motion['asset_mode']=='production',assets,roles))
+        elif assets and motion['asset_mode']=='production':
+            errors.append('Legacy 0.1 is parallax-only; migrate motion_plan to 0.2 for production '+sid)
         bgz=[l['z'] for l in item['layers'] if roles.get(l['layer_id'])=='background']
         if bgz and bgz[0]!=min(l['z'] for l in item['layers']): errors.append('Background must be bottom layer '+sid)
         if assets and motion['asset_mode']=='production' and not all(item['review'][k] for k in ('master_alignment','background_completed','motion_bounds_checked')): errors.append('Production visual review incomplete '+sid)
@@ -96,7 +101,7 @@ def validate(project, assets=False):
             for t in (layer['from'],layer['to']):
                 if abs(t['x'])>(t['scale']-1)*width/2+1e-6 or abs(t['y'])>(t['scale']-1)*height/2+1e-6: errors.append('Motion can reveal canvas edge '+sid+'/'+layer['layer_id'])
         if assets:
-            for name,role in [(shot['master'],'master')]+[(l['asset'],roles.get(l['layer_id'])) for l in item['layers']]:
+            for name,role in [(shot['master'],'master')]+[(name,roles.get(l['layer_id'])) for l in item['layers'] for name in asset_names(l)]:
                 p=local(project,name)
                 if not p.is_file(): errors.append('Missing asset '+name); continue
                 try:
@@ -130,6 +135,12 @@ def compile_prompts(project,data):
     for char in chars['characters']:
         save(project/'prompts'/('reference_'+char['id']+'.json'),{'task':'character_reference','identity':char['identity'],'prompt':char['reference']['prompt'],'output':char['reference']['image'],'lock':'identity_only','visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'setting':brief['setting']})
     for shot in board['shots']:
+        plan=next(s for s in data['motion_plan']['shots'] if s['shot_id']==shot['id'])
+        save(project/'prompts'/(shot['id']+'_acting.json'),{
+            'task':'prepare_aligned_acting_assets','master':shot['master'],
+            'performers':shot['characters'],'performance':plan.get('performance'),
+            'layers':plan['layers'],
+            'instructions':'Design anticipation, action, reaction and hold. Generate fresh pose drawings or separate joints from this shot master; fill exposed areas. Keep identity and contact points consistent. Never substitute a lineup crop or camera zoom for acting.'})
         save(project/'prompts'/(shot['id']+'.json'),{'task':'fresh_master_composition','output':shot['master'],'canvas':brief['format'],'original_content':brief['original_content'],'preserve':brief['content_preservation'],'setting':brief['setting'],'visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'beat':next(b for b in board['beats'] if b['id']==shot['beat_id']),'shot':shot,'identity_references':[{'image':lookup[c['character_id']]['reference']['image'],'identity':lookup[c['character_id']]['identity'],'reference_scope':'face/hair/clothes/proportions only; do not copy pose or composition'} for c in shot['characters']],'negative_constraints':['Do not change cultural setting or topic','Do not paste or recycle a reference standing pose','No baked-in dialogue or captions']+style_avoid,'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.'})
 
 def main():
@@ -151,8 +162,9 @@ def main():
         shutil.copytree(ROOT/'assets/remotion',renderer,dirs_exist_ok=True)
         for shot in data['motion_plan']['shots']:
             for layer in shot['layers']:
-                dest=local(renderer/'public',layer['asset']); dest.parent.mkdir(parents=True,exist_ok=True)
-                shutil.copy2(local(project,layer['asset']),dest)
+                for name in asset_names(layer):
+                    dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
+                    shutil.copy2(local(project,name),dest)
         save(renderer/'src/render-data.json',{'format':data['production_brief']['format'],**data['motion_plan']})
     print(f'PASS: {args.command}; {len(warnings)} repetition warning(s). See qc_report.json; semantic/visual QC remains human or agent reviewed.')
     return 0

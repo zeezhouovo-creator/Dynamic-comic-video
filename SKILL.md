@@ -5,7 +5,7 @@ description: Create fixed-panel sequential comic videos from original stories, l
 
 # Dynamic Comic Video — V0.3 candidate
 
-新项目先读取 [项目启动引导](references/project-intake.md)，先确认已有完整漫画、已有单张分镜、已有角色设定或从零生成；素材来源、角色、画风和比例未明确前，不直接批量生成正式分镜。
+新项目先读取 [项目启动引导](references/project-intake.md)，先收集用户的主题/故事、受众、视觉语言和成片比例，再由 Skill 生成角色、漫画分镜和视频素材。用户上传的图片只可作为身份或风格参考，不直接作为最终漫画镜头输入。
 
 把用户当次提供的原创内容转为可追溯的分镜、逐镜新绘的 master、对齐图层和 Remotion MP4。内容可以是现实故事、历史、科普、教育、产品说明、品牌叙事、幻想或其他用户指定主题。V0.1 的最小闭环是 Agent 编导与图像工具协作，加本地确定性校验和渲染；不是无需图像工具的自动绘制服务。
 
@@ -33,7 +33,7 @@ V0.3 候选制作流程见 [对白时间轴、素材与逐镜重做](references/
 
 人物动作遵循 [人物动作自然度规则](references/motion-naturalness.md)：默认静止，事件触发，准备→动作→停顿/回稳；禁止周期性上下浮动、摇摆、缩放、机械呼吸和固定频率重复动作。
 
-用户要求原始漫画“活起来”、固定构图或克制微动作时，采用 [固定机位微动作](references/fixed-camera-micro.md)，填写 `performance.mode: fixed-camera-micro`。已有漫画直接作为 master，保留其原始姿势和构图；此时逐镜新绘规则仅适用于缺失的局部动作素材，不要求重新设计已有画面。禁止镜头推拉、缩放、平移、旋转和视差。保留二维线条、身份、服装与背景，围绕眨眼、说话、呼吸和轻微摆动设计动作。
+用户要求固定构图或克制微动作时，采用 [固定机位微动作](references/fixed-camera-micro.md)，填写 `performance.mode: fixed-camera-micro`。固定构图来自 Skill 生成的 master composition；参考图只用于保持身份或风格，不直接作为 master。禁止镜头推拉、缩放、平移、旋转和视差。围绕眨眼、说话、视线和事件触发的轻微动作设计表演。
 
 1. **Visual / Production Brief**：保存原文、内容保留项、文化时空、视觉语言、情绪和尺寸/帧率/总帧数为 `production_brief.json`。
 2. **Character Planning → Reference**：建立 `characters.json`，选择需要保持一致的角色，写 identity 与身份参考提示词。使用可用图像工具生成 reference 并目视核对，再设 `status: ready`。无人物项目允许空列表。不要为了凑人物改写原文。

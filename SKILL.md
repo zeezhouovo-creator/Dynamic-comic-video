@@ -23,6 +23,8 @@ Skill 仓库保存能力，不保存用户作品。每次任务先在独立工�
 
 ## 工作流程与交付
 
+用户要求原始漫画“活起来”、固定构图或克制微动作时，采用 [固定机位微动作](references/fixed-camera-micro.md)，填写 `performance.mode: fixed-camera-micro`。已有漫画直接作为 master，保留其原始姿势和构图；此时逐镜新绘规则仅适用于缺失的局部动作素材，不要求重新设计已有画面。禁止镜头推拉、缩放、平移、旋转和视差。保留二维线条、身份、服装与背景，围绕眨眼、说话、呼吸和轻微摆动设计动作。
+
 1. **Visual / Production Brief**：保存原文、内容保留项、文化时空、视觉语言、情绪和尺寸/帧率/总帧数为 `production_brief.json`。
 2. **Character Planning → Reference**：建立 `characters.json`，选择需要保持一致的角色，写 identity 与身份参考提示词。使用可用图像工具生成 reference 并目视核对，再设 `status: ready`。无人物项目允许空列表。不要为了凑人物改写原文。
 3. **Narrative Beats → Storyboard Director**：在 `storyboard.json` 先写 beats 的原文摘录与变化，再写 shots；每镜明确目的、人物动作/表情/视线、景别、角度、构图、连续性与拟分层理由。无意义的 foreground/effects 不拆。

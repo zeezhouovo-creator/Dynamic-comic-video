@@ -62,5 +62,27 @@ class ActingTests(PipelineTests):
     def test_missing_pose_asset(self):
         (self.project/'shots/shot_001/layers/blink.png').unlink()
         self.assertTrue(validate(self.project,True)[1])
+    def test_fixed_camera_micro(self):
+        def micro(d):
+            for s in d['shots']:
+                s['performance']['mode']='fixed-camera-micro'
+                for l in s['layers']:
+                    for k in l.get('acting',{}).get('keys',[]):
+                        k['rotation']=k['rotation']/60
+        self.edit('motion_plan',micro)
+        self.assertEqual(validate(self.project,True)[1],[])
+        self.edit('motion_plan',lambda d:d['shots'][0]['layers'][0]['to'].update(scale=1.05))
+        self.assertTrue(any('identity layer framing' in x for x in validate(self.project)[1]))
+    def test_micro_rejects_large_action(self):
+        self.edit('motion_plan',lambda d:d['shots'][0]['performance'].update(mode='fixed-camera-micro'))
+        self.assertTrue(any('exceeds 2 degrees' in x for x in validate(self.project)[1]))
+    def test_micro_rejects_background_acting(self):
+        def background(d):
+            s=d['shots'][0]
+            s['performance']['mode']='fixed-camera-micro'
+            import copy
+            s['layers'][0]['acting']=copy.deepcopy(s['layers'][2]['acting'])
+        self.edit('motion_plan',background)
+        self.assertTrue(any('background must remain unchanged' in x for x in validate(self.project)[1]))
 
 if __name__=='__main__': unittest.main()

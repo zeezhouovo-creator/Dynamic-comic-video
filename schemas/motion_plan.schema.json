@@ -29,6 +29,7 @@
           "performance": {
             "type": "object",
             "properties": {
+              "mode": {"enum": ["limited-animation", "fixed-camera-micro"]},
               "intent": {"type": "string", "minLength": 1},
               "static_reason": {"type": "string", "minLength": 1},
               "reviewed": {"type": "boolean"}

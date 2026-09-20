@@ -23,6 +23,27 @@ def check_acting(shot, production, assets, roles):
         changing=len({(k['x'],k['y'],k['rotation'],k['opacity']) for k in keys})>1
         pose_change=len({p['asset'] for p in poses})>1
         speech=a.get('speech')
+        events=a.get('events',[])
+        if events:
+            previous_end=-1; signatures=[]
+            for event in events:
+                start,peak,settle,end=(event[k] for k in ('start_frame','peak_frame','settle_frame','end_frame'))
+                if not (start<=peak<=settle<=end<shot['duration_frames']):
+                    errors.append('Invalid event phases; require prepare/action/settle within shot '+sid+'/'+layer['layer_id'])
+                if start<previous_end:
+                    errors.append('Overlapping acting events on one layer '+sid+'/'+layer['layer_id'])
+                previous_end=end
+                signatures.append((event['trigger'],event['description']))
+            if len(signatures)!=len(set(signatures)):
+                errors.append('Repeated identical acting event; actions must be event-triggered '+sid+'/'+layer['layer_id'])
+        # A layer with no event remains a stable hold by default. Keys may hold that state;
+        # they must not be used as an always-on sine/cosine-style loop.
+        if len(keys)>=6:
+            values=[(k['x'],k['y'],k['rotation'],k['opacity']) for k in keys]
+            alternating=(values[0]==values[2]==values[4] and values[1]==values[3]==values[5])
+            returning=(values[0]==values[-1] and values[1]==values[-2] and values[2]==values[-3])
+            if (alternating or returning) and len(set(values))>2:
+                errors.append('Periodic acting loop is not allowed; return to a stable hold '+sid+'/'+layer['layer_id'])
         if speech:
             if poses: errors.append('Speech and explicit poses cannot share one mouth track '+sid)
             if a['part']!='mouth' or speech['closed_asset']==speech['open_asset']:

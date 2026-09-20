@@ -104,5 +104,15 @@ class ActingTests(PipelineTests):
             s['layers'][0]['acting']=copy.deepcopy(s['layers'][2]['acting'])
         self.edit('motion_plan',background)
         self.assertTrue(any('background must remain unchanged' in x for x in validate(self.project)[1]))
+    def test_event_phase_order(self):
+        def add_event(d):
+            d['shots'][0]['layers'][2]['acting']['events']=[{'event_id':'blink','trigger':'information','start_frame':20,'peak_frame':12,'settle_frame':16,'end_frame':24,'description':'invalid order'}]
+        self.edit('motion_plan',add_event)
+        self.assertTrue(any('Invalid event phases' in x for x in validate(self.project)[1]))
+    def test_periodic_loop_rejected(self):
+        def loop(d):
+            d['shots'][0]['layers'][2]['acting']['keys']=[{'frame':f,'x':x,'y':0,'rotation':0,'opacity':1} for f,x in [(0,0),(8,5),(16,0),(24,5),(32,0),(40,5)]]
+        self.edit('motion_plan',loop)
+        self.assertTrue(any('Periodic acting loop' in x for x in validate(self.project)[1]))
 
 if __name__=='__main__': unittest.main()

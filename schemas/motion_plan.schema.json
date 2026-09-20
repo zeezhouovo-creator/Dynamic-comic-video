@@ -183,6 +183,18 @@
           },
           "required":["speaker","closed_asset","open_asset"],"additionalProperties":false
         },
+        "events": {
+          "type":"array",
+          "items":{"type":"object","properties":{
+            "event_id":{"type":"string","minLength":1},
+            "trigger":{"enum":["speech","information","pause","emotion","action"]},
+            "start_frame":{"type":"integer","minimum":0},
+            "peak_frame":{"type":"integer","minimum":0},
+            "settle_frame":{"type":"integer","minimum":0},
+            "end_frame":{"type":"integer","minimum":0},
+            "description":{"type":"string","minLength":1}
+          },"required":["event_id","trigger","start_frame","peak_frame","settle_frame","end_frame","description"],"additionalProperties":false}
+        },
         "pivot": {"type": "array", "items": {"type": "number", "minimum": 0, "maximum": 1}, "minItems": 2, "maxItems": 2},
         "keys": {
           "type": "array", "minItems": 2,

@@ -64,6 +64,21 @@
             "type": "string",
             "minLength": 1
           },
+          "transition": {"const": "cut"},
+          "dialogue": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "speaker": {"type": "string", "minLength": 1},
+                "text": {"type": "string", "minLength": 1},
+                "start_frame": {"type": "integer", "minimum": 0},
+                "end_frame": {"type": "integer", "minimum": 1}
+              },
+              "required": ["speaker", "text", "start_frame", "end_frame"],
+              "additionalProperties": false
+            }
+          },
           "setting": {
             "type": "string",
             "minLength": 1

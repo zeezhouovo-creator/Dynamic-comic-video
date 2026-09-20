@@ -62,6 +62,26 @@ class ActingTests(PipelineTests):
     def test_missing_pose_asset(self):
         (self.project/'shots/shot_001/layers/blink.png').unlink()
         self.assertTrue(validate(self.project,True)[1])
+    def test_sequential_requires_dialogue(self):
+        self.edit('storyboard',lambda d:d['shots'][0].pop('dialogue'))
+        self.assertTrue(any('requires dialogue' in x for x in validate(self.project)[1]))
+    def test_dialogue_cannot_cross_cut(self):
+        self.edit('storyboard',lambda d:d['shots'][0]['dialogue'][0].update(end_frame=49))
+        self.assertTrue(any('Invalid dialogue timing' in x for x in validate(self.project)[1]))
+    def test_dialogue_cannot_overlap(self):
+        self.edit('storyboard',lambda d:d['shots'][0]['dialogue'].append({'speaker':'lin','text':'Overlap','start_frame':20,'end_frame':30}))
+        self.assertTrue(any('Invalid dialogue timing' in x for x in validate(self.project)[1]))
+    def test_sequential_rejects_camera_move(self):
+        self.edit('motion_plan',lambda d:d['shots'][0]['layers'][0]['to'].update(scale=1.05))
+        self.assertTrue(any('identity layer framing' in x for x in validate(self.project)[1]))
+    def test_compiled_panel_review(self):
+        from pipeline import compile_prompts
+        data,errors,_=validate(self.project)
+        self.assertEqual(errors,[])
+        compile_prompts(self.project,data)
+        self.assertTrue((self.project/'storyboard_review.md').is_file())
+        prompt=read(self.project/'prompts/shot_001_acting.json')
+        self.assertEqual(prompt['dialogue'],data['storyboard']['shots'][0]['dialogue'])
     def test_fixed_camera_micro(self):
         def micro(d):
             for s in d['shots']:

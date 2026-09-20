@@ -85,6 +85,14 @@ def validate(project, assets=False):
         cursor+=item['duration_frames']
         if not shot: continue
         if item['duration_frames']!=shot['duration_frames']: errors.append('Duration mismatch '+sid)
+        sequential=(item.get('performance') or {}).get('mode')=='sequential-comic'
+        if sequential and ('dialogue' not in shot or shot.get('transition')!='cut'):
+            errors.append('Sequential comic requires dialogue (empty for silent shots) and cut transition '+sid)
+        caption_end=0
+        for cue in shot.get('dialogue',[]):
+            if cue['start_frame']<caption_end or not cue['start_frame']<cue['end_frame']<=shot['duration_frames']:
+                errors.append('Invalid dialogue timing '+sid)
+            caption_end=cue['end_frame']
         lids=unique(item['layers'],'layer_id',sid+' motion layer')
         if lids!={l['id'] for l in shot['layers']}: errors.append('Layer set mismatch '+sid)
         unique(item['layers'],'z',sid+' z order')
@@ -134,12 +142,20 @@ def compile_prompts(project,data):
                    if paper_style else [])
     for char in chars['characters']:
         save(project/'prompts'/('reference_'+char['id']+'.json'),{'task':'character_reference','identity':char['identity'],'prompt':char['reference']['prompt'],'output':char['reference']['image'],'lock':'identity_only','visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'setting':brief['setting']})
+    panels=[]
+    for s in board['shots']:
+        acting='；'.join(f"{c['character_id']}：{c['action']}；{c['expression']}" for c in s['characters']) or '无人；按场景叙事'
+        dialogue='；'.join(f"{c['speaker']}：{c['text']} [{c['start_frame']},{c['end_frame']})帧" for c in s.get('dialogue',[])) or '无对白'
+        panels.append(f"## {s['id']}\n\n【画面】{s['setting']}；{s['composition']}\n\n【人物动作/表情】{acting}\n\n【台词/字幕】{dialogue}\n\n【持续时间】{s['duration_frames']/brief['format']['fps']:.3f} 秒（{s['duration_frames']} 帧）\n\n【切换方式】直接切换下一漫画分镜\n")
+    (project/'storyboard_review.md').write_text('\n'.join(panels),encoding='utf-8')
     for shot in board['shots']:
         plan=next(s for s in data['motion_plan']['shots'] if s['shot_id']==shot['id'])
         save(project/'prompts'/(shot['id']+'_acting.json'),{
             'task':'prepare_aligned_acting_assets','master':shot['master'],
             'performers':shot['characters'],'performance':plan.get('performance'),
             'layers':plan['layers'],
+            'dialogue':shot.get('dialogue',[]),
+            'sequential_comic_constraints':('One panel expresses one line, action or reaction. Fixed camera and composition. Animate character mouths, eyes, expressions, head, hands or simple limbs; use a new hard-cut panel for complex actions and new angles. Comic exaggeration, symbols and text effects are allowed for punchlines. Preserve character identity across panels. Subtitles follow supplied dialogue intervals. No camera motion or whole-image stretch as acting.' if (plan.get('performance') or {}).get('mode')=='sequential-comic' else None),
             'micro_performance_constraints':({'primary':'Exactly one complete blink per original comic shot; small mouth opening only during timed speech; extremely slight head turn; almost imperceptible chest/shoulder breathing; minimal hair movement. Preserve original pose and expression design.','secondary':'Remain still except optional occasional blinking. No secondary head, breathing or sway tracks.','stability':'No camera movement, whole-image stretch, large limb action, position changes, facial drift, deformed hands/feet or twisted bodies. Preserve original 2D linework.','review':'Visually count one primary blink and verify secondary stillness and anatomical stability; these are not automatically pixel-validated.'} if (plan.get('performance') or {}).get('mode')=='fixed-camera-micro' else None),
             'instructions':('Preserve the original master composition and pose. Fixed camera: no zoom, pan, rotation, scale or parallax. Animate only subtle local blinking, speech-timed mouth shapes, breathing and small head/hair/clothing motion. Keep background, identity and linework stable; no stretching or deformation. Mouth motion requires supplied dialogue timings and aligned local assets; automatic lip sync is not implemented.' if (plan.get('performance') or {}).get('mode')=='fixed-camera-micro' else 'Design anticipation, action, reaction and hold. Generate fresh pose drawings or separate joints from this shot master; fill exposed areas. Keep identity and contact points consistent. Never substitute a lineup crop or camera zoom for acting.')})
         save(project/'prompts'/(shot['id']+'.json'),{'task':'fresh_master_composition','output':shot['master'],'canvas':brief['format'],'original_content':brief['original_content'],'preserve':brief['content_preservation'],'setting':brief['setting'],'visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'beat':next(b for b in board['beats'] if b['id']==shot['beat_id']),'shot':shot,'identity_references':[{'image':lookup[c['character_id']]['reference']['image'],'identity':lookup[c['character_id']]['identity'],'reference_scope':'face/hair/clothes/proportions only; do not copy pose or composition'} for c in shot['characters']],'negative_constraints':['Do not change cultural setting or topic','Do not paste or recycle a reference standing pose','No baked-in dialogue or captions']+style_avoid,'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.'})
@@ -166,7 +182,9 @@ def main():
                 for name in asset_names(layer):
                     dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
                     shutil.copy2(local(project,name),dest)
-        save(renderer/'src/render-data.json',{'format':data['production_brief']['format'],**data['motion_plan']})
+        render_data={'format':data['production_brief']['format'],**data['motion_plan']}
+        render_data['shots']=[{**s,'dialogue':next(b for b in data['storyboard']['shots'] if b['id']==s['shot_id']).get('dialogue',[])} for s in data['motion_plan']['shots']]
+        save(renderer/'src/render-data.json',render_data)
     print(f'PASS: {args.command}; {len(warnings)} repetition warning(s). See qc_report.json; semantic/visual QC remains human or agent reviewed.')
     return 0
 

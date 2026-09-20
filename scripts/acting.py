@@ -7,8 +7,9 @@ def check_acting(shot, production, assets, roles):
     sid=shot['shot_id']; perf=shot.get('performance')
     if not perf: errors.append('Missing performance plan '+sid)
     micro=(perf or {}).get('mode')=='fixed-camera-micro'
+    fixed=micro or (perf or {}).get('mode')=='sequential-comic'
     for layer in shot['layers']:
-        if micro and any(layer[t]!={'x':0,'y':0,'scale':1} for t in ('from','to')):
+        if fixed and any(layer[t]!={'x':0,'y':0,'scale':1} for t in ('from','to')):
             errors.append('Fixed-camera mode requires identity layer framing '+sid+'/'+layer['layer_id'])
         a=layer.get('acting')
         if not a: continue
@@ -20,10 +21,10 @@ def check_acting(shot, production, assets, roles):
                 errors.append('Invalid acting frames '+sid+'/'+layer['layer_id'])
         changing=len({(k['x'],k['y'],k['rotation'],k['opacity']) for k in keys})>1
         pose_change=len({p['asset'] for p in poses})>1
-        if micro:
+        if fixed:
             if roles.get(layer['layer_id'])=='background' and (pose_change or any(k['x'] or k['y'] or k['rotation'] or k['opacity']!=1 for k in keys)):
                 errors.append('Fixed-camera background must remain unchanged '+sid)
-            if any(abs(k['rotation'])>2 for k in keys):
+            if micro and any(abs(k['rotation'])>2 for k in keys):
                 errors.append('Micro acting rotation exceeds 2 degrees '+sid+'/'+layer['layer_id'])
         # Whole-cutout movement is still camera-like; local joints or new drawings count.
         if roles.get(layer['layer_id'])!='background' and (pose_change or (a['part']!='whole' and changing)):

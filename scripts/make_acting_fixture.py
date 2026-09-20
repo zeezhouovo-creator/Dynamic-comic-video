@@ -11,7 +11,7 @@ def build(root):
         if name=='motion_plan':
             d['version']='0.2'
             for s in d['shots']:
-                s['performance']={'intent':'Robot raises arm and blinks with camera fixed','reviewed':False}
+                s['performance']={'mode':'sequential-comic','intent':'Robot raises arm and blinks with camera fixed','reviewed':False}
                 s['layers']=[s['layers'][0]]
                 for lid,z,part in [('body',10,'whole'),('arm',20,'arm'),('eyes',30,'eyes')]:
                     base=f"shots/{s['shot_id']}/layers/"
@@ -23,6 +23,8 @@ def build(root):
                 s['layers'][0]['from']=s['layers'][0]['to']={'x':0,'y':0,'scale':1}
         elif name=='storyboard':
             for s in d['shots']:
+                s['transition']='cut'
+                s['dialogue']=[{'speaker':'lin','text':'Fixed panel. Character action.','start_frame':6,'end_frame':48}]
                 s['layers']=[s['layers'][0]]+[{'id':lid,'role':'character','character_id':'lin','elements':'Synthetic robot '+lid,'method':'extract','reason':'Joint animation test'} for lid in ('body','arm','eyes')]
         save(root/(name+'.json'),d)
     for i in range(1,4):

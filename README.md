@@ -34,7 +34,7 @@ bash scripts/setup.sh
 
 ## V1.0 candidate / V0.4 stable engine
 
-默认制作固定构图的连续分镜式动态漫画。V0.4 是已验收的执行引擎；V1.0 在其上增加项目状态识别、入口分流、最小提问、统一 Scene 路由、用户反馈定位和局部返工控制。需要恢复或交接项目时可使用 [项目状态机](references/project-state.md)。完整总控规则见 [V1.0 总控系统](references/v10-control-system.md)，执行闭环见 [V0.4 制作闭环](references/v04-production.md)。V1.0 仍不是精确音素口型、自动抠图或无人审核的全自动成片。
+默认制作固定构图的连续分镜式动态漫画。V0.4 是已验收的执行引擎；V1.0 在其上增加项目状态识别、入口分流、最小提问、统一 Scene 路由、用户反馈定位和局部返工控制。需要恢复或交接项目时可使用 [项目状态机](references/project-state.md)，用 `inspect` 只读判断下一阶段。完整总控规则见 [V1.0 总控系统](references/v10-control-system.md)，执行闭环见 [V0.4 制作闭环](references/v04-production.md)。V1.0 仍不是精确音素口型、自动抠图或无人审核的全自动成片。
 
 分镜生成统一使用 [分镜生成主规则](references/storyboard-director.md)：同一空间连续、背景构图按独立机位变化、角色身份连续、说话与倾听均有表演、切镜有因果，并输出17项逐镜审阅稿。旧五项简表已替换。
 

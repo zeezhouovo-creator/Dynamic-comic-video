@@ -9,11 +9,14 @@ V1.0 使用 `project_state.json` 保存总控层的当前阶段。它只记录�
 ```powershell
 python scripts/project_state.py init <project>
 python scripts/project_state.py show <project>
+python scripts/project_state.py inspect <project>
 python scripts/project_state.py transition <project> STORYBOARD --reason "beats 已确认"
 python scripts/project_state.py route-feedback "字幕太快"
 ```
 
 状态只能沿允许的路径流转；用户反馈通常先进入 `REVISION`，再回到实际需要返工的阶段。`route-feedback` 只给出建议，不直接修改项目文件。
+
+`inspect` 是只读检查：根据项目文件给出建议阶段和缺失项。它不会推断 `FINAL`，因为最终确认必须来自用户，而不是文件是否存在。
 
 ## 与制作文件的关系
 

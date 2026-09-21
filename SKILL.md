@@ -3,9 +3,9 @@ name: dynamic-comic-video
 description: Create fixed-panel sequential comic videos from original stories, lessons or explainers, with identity-consistent fresh panels, local character acting, timed dialogue and captions, simple speech-driven mouth movement and Remotion MP4 rendering. Topic-agnostic; not full frame-by-frame animation or phoneme lip sync.
 ---
 
-# Dynamic Comic Video — V0.4
+# Dynamic Comic Video — V1.0 candidate
 
-新项目先读取 [动态漫画制作向导](references/production-wizard.md)，自动判断已有素材和已知信息，只补问当前阶段缺失的内容，再由 Skill 生成或读取分镜、设计表演并输出视频。旧的固定问卷式入口不适用。
+新项目先读取 [V1.0 总控系统](references/v10-control-system.md)，再按 [动态漫画制作向导](references/production-wizard.md) 自动判断项目状态、已有素材和已知信息，只补问当前阶段缺失的内容，再由 Skill 生成或读取分镜、设计表演并输出视频。旧的固定问卷式入口不适用。
 
 把用户当次提供的原创内容转为可追溯的分镜、逐镜新绘的 master、对齐图层和 Remotion MP4。内容可以是现实故事、历史、科普、教育、产品说明、品牌叙事、幻想或其他用户指定主题。V0.1 的最小闭环是 Agent 编导与图像工具协作，加本地确定性校验和渲染；不是无需图像工具的自动绘制服务。
 
@@ -54,6 +54,10 @@ V0.4 将“向导 → 分镜 → 表演 → 音频时间轴 → 视听反馈 →
 V0.4 仍然不承诺精确音素口型、骨骼绑定、完整逐帧动画、自动抠图或无人审核的全自动成片。`motion_plan.version: "0.3"`、其他 JSON 合同的 `0.1` 版本和旧的 0.2 迁移入口继续可读；只有在合同真的发生不兼容变化时才另开 schema 版本。
 
 下一阶段的优化边界见 [V0.5 优化路线](references/v05-roadmap.md)：优先增加可检查的头部、手部、道具和界面局部表演，改善配音与停顿，再扩展到完整短话；不以持续运动或镜头推拉替代角色表演。
+
+## V1.0 总控层
+
+V1.0 在 V0.4 执行层之上增加项目状态机（INIT、CHARACTER、STORY、STORYBOARD、ANIMATION、AUDIO、PERFORMANCE、COMPOSITION、QUALITY_CHECK、PREVIEW、REVISION、FINAL）、入口分流、最小提问、用户反馈路由和最小修改原则。完整规则见 [V1.0 总控系统](references/v10-control-system.md)。V1.0 当前为候选版，不改变 V0.4 的 JSON 合同、固定镜头和本地素材边界。
 
 ## Repetition QC
 

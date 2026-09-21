@@ -8,6 +8,11 @@ command -v python3 >/dev/null || { echo "Python 3.10+ is required." >&2; exit 1;
 command -v npm >/dev/null || { echo "Node.js/npm is required for MP4 rendering." >&2; exit 1; }
 
 mkdir -p "$INSTALL_ROOT"
+if [ "$(cd "$REPO_ROOT" && pwd)" != "$(cd "$INSTALL_ROOT" && pwd)" ]; then
+  find "$REPO_ROOT" -mindepth 1 -maxdepth 1 \
+    ! -name .git ! -name .venv ! -name node_modules ! -name projects \
+    ! -name renderer ! -name manga-renderer -exec cp -R {} "$INSTALL_ROOT" \;
+fi
 python3 -m venv "$INSTALL_ROOT/.venv"
 "$INSTALL_ROOT/.venv/bin/python" -m pip install -r "$REPO_ROOT/requirements.txt"
 (cd "$INSTALL_ROOT/assets/remotion" && npm ci)

@@ -13,6 +13,11 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) { throw "Python 3.1
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { throw "Node.js/npm is required for MP4 rendering." }
 
 New-Item -ItemType Directory -Force $InstallRoot | Out-Null
+if ((Resolve-Path $RepoRoot).Path -ne (Resolve-Path $InstallRoot).Path) {
+  Get-ChildItem -LiteralPath $RepoRoot -Force | Where-Object {
+    $_.Name -notin @('.git', '.venv', 'node_modules', 'projects', 'renderer', 'manga-renderer')
+  } | Copy-Item -Destination $InstallRoot -Recurse -Force
+}
 python -m venv (Join-Path $InstallRoot ".venv")
 $Py = Join-Path $InstallRoot ".venv\Scripts\python.exe"
 & $Py -m pip install -r (Join-Path $RepoRoot "requirements.txt")

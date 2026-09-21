@@ -3,7 +3,7 @@ name: dynamic-comic-video
 description: Create fixed-panel sequential comic videos from original stories, lessons or explainers, with identity-consistent fresh panels, local character acting, timed dialogue and captions, simple speech-driven mouth movement and Remotion MP4 rendering. Topic-agnostic; not full frame-by-frame animation or phoneme lip sync.
 ---
 
-# Dynamic Comic Video — V0.3 candidate
+# Dynamic Comic Video — V0.4 candidate
 
 新项目先读取 [动态漫画制作向导](references/production-wizard.md)，自动判断已有素材和已知信息，只补问当前阶段缺失的内容，再由 Skill 生成或读取分镜、设计表演并输出视频。旧的固定问卷式入口不适用。
 
@@ -21,7 +21,7 @@ Skill 仓库保存能力，不保存用户作品。每次任务先在独立工�
 - Character Reference 只锁脸、发型、服装、比例和辨识特征。参考图中的姿势、表情、景别、光线、构图不锁定。每个人物镜头按剧情重新绘制表演；禁止反复粘贴一张固定立绘。
 - 先从原文提取 Narrative Beats（信息、行动或情绪的变化），再为每个 beat 设计一个或多个 Shots。不要按相同秒数或句子机械切镜。
 - 先完整 master composition，再以该 master 分离/重建图层。统一画布、坐标、透视、尺度与光向；角色移开后背景必须补全。不能独立生成几张互不对齐的图来凑层。
-- 每镜以动作与表情变化为核心。V0.2 支持局部部件关键帧（平移、关节旋转、透明度）和对齐姿态图片切换，视差仅为辅助。相机固定后仍应看出表演；有叙事理由的静止镜头须记录停顿目的。详见 [有限动画](references/limited-animation.md)。不包含自动补间、骨骼绑定或嘴型同步。
+- 每镜以动作与表情变化为核心。当前 V0.4 使用事件驱动的局部关键帧、对齐姿态图片切换和配音驱动的简单嘴部开合；视差只属于旧兼容路径。相机固定后仍应看出表演；有叙事理由的静止镜头须记录停顿目的。详见 [有限动画](references/limited-animation.md)。不包含自动补间、精确音素口型或骨骼绑定。
 
 ## 工作流程与交付
 
@@ -29,7 +29,7 @@ Skill 仓库保存能力，不保存用户作品。每次任务先在独立工�
 
 **分镜生成统一执行 [分镜生成主规则](references/storyboard-director.md)，已替换原来的五项简表和通用分镜建议。**先建立场景空间记录，再独立设计每镜的背景视图、角色表演、倾听反应及切镜因果。跨镜保持空间与角色身份，禁止机械复用背景；镜内固定机位。每镜输出用户指定的17项字段，对白后按叙事需要留反应时间。旧文中的立即切镜和配角静止建议不作为本模式通用规则。
 
-V0.3 候选制作流程见 [对白时间轴、素材与逐镜重做](references/v03-production.md)：支持本地配音、字幕与音量驱动的简单嘴部开合，素材缺项报告、单镜编译/渲染，以及固定 master 的局部表情替换。发布正式 V0.3 前，必须通过真实3—5镜样片验收；不能只凭夹具测试通过命名正式成片。
+V0.4 候选制作流程见 [V0.4 制作闭环](references/v04-production.md)：在 V0.3 的固定分镜、对白时间轴和局部表演基础上，统一加入制作向导、角色一致性检查、视听事件、预览前质量闸门和一体化安装。`motion_plan` 仍使用 0.3，保持已有项目兼容；这里的 V0.4 是 Skill 工作流版本，不是新的 JSON 合同版本。发布稳定 V0.4 前，必须通过真实 3—5 镜样片验收；不能只凭夹具测试通过命名正式成片。
 
 默认视频形式为 [连续分镜式动态漫画](references/sequential-comic.md)，使用 `performance.mode: sequential-comic`。独立漫画分镜、固定构图、人物表演；台词和动作后按剧情保留短暂反应，再硬切下一格。字幕跟随对白时间。复杂动作优先拆为下一张分镜。情绪重点允许漫画式夸张，日常对白保持克制。跨镜锁定角色身份与场景空间，背景构图随机位重新绘制。此模式禁用视差及镜头推拉、平移、旋转、缩放，优先于一般有限动画建议。主题可变，表现形式统一。
 
@@ -46,6 +46,12 @@ V0.3 候选制作流程见 [对白时间轴、素材与逐镜重做](references/
 7. **质量闸门 → QC → Remotion → MP4**：预览前运行 [动态漫画质量闸门](references/quality-gate.md) 和 `scripts/quality_gate.py`，先修复 Critical/Major 问题，再运行素材校验、prepare、Remotion 渲染。复查所有切点前后帧和每镜首/中/末帧；报告测试/正式素材状态、时长、尺寸、遗留问题与输出位置。质量闸门只能自动修复安全的时间轴元数据，不能用标签或自动修正掩盖角色、场景和表演问题。
 
 数据契约见 [契约说明](references/contracts.md) 与 `schemas/*.schema.json`；可执行步骤见 [运行指南](references/runbook.md)。可选画风见 [纸片拼贴画风](references/paper-collage-style.md)。`examples/library/` 只是一个中国南方小城图书馆的原创测试样例，用来示范“视觉语言不改变内容题材”，不是技能的主题限制。
+
+## V0.4 质量与兼容边界
+
+V0.4 将“向导 → 分镜 → 表演 → 音频时间轴 → 视听反馈 → 质量闸门 → Remotion”作为一条可追踪流程。质量闸门先修复 Critical/Major 问题，再允许生成预览；局部问题只回到对应模块处理。版本升级不改变用户主题，也不把参考图直接当成最终镜头。
+
+V0.4 仍然不承诺精确音素口型、骨骼绑定、完整逐帧动画、自动抠图或无人审核的全自动成片。`motion_plan.version: "0.3"`、其他 JSON 合同的 `0.1` 版本和旧的 0.2 迁移入口继续可读；只有在合同真的发生不兼容变化时才另开 schema 版本。
 
 ## Repetition QC
 

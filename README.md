@@ -32,9 +32,9 @@ bash scripts/setup.sh
 
 日常修改请从 `main` 创建分支并提交 Pull Request。提交前运行 [贡献指南](CONTRIBUTING.md) 中的测试。版本变化记录在 [CHANGELOG.md](CHANGELOG.md)，稳定版本使用 Git tag 标记。
 
-## V0.3 候选版
+## V0.4 候选版
 
-默认制作固定构图的连续分镜式动态漫画。新增本地 WAV 配音、同步字幕、音量驱动的简单嘴部开合、局部表情替换、素材缺项/变化报告和指定镜头编译、渲染。完整用法和真实样片验收标准见 [V0.3 制作闭环](references/v03-production.md)。不是精确音素口型、自动抠图或无人审核的全自动成片；正式版本标签须通过真实3—5镜样片验收后发布。
+默认制作固定构图的连续分镜式动态漫画。V0.4 在 V0.3 的本地 WAV 配音、同步字幕、简单嘴部开合、局部表情替换和指定镜头编译/渲染基础上，增加制作向导、角色一致性规则、统一视听时间轴、漫画反馈事件和预览前质量闸门。完整用法和真实样片验收标准见 [V0.4 制作闭环](references/v04-production.md)。它仍不是精确音素口型、自动抠图或无人审核的全自动成片；正式版本标签须通过真实 3—5 镜样片验收后发布。
 
 分镜生成统一使用 [分镜生成主规则](references/storyboard-director.md)：同一空间连续、背景构图按独立机位变化、角色身份连续、说话与倾听均有表演、切镜有因果，并输出17项逐镜审阅稿。旧五项简表已替换。
 
@@ -46,9 +46,9 @@ bash scripts/setup.sh
 - pose、景别、角度、构图标签的重复预警，以及重复人物 PNG 的阻断检查。
 - Remotion 局部部件平移、关节旋转、透明度关键帧，以及对齐姿态图片切换；硬切和视差作为辅助。
 - 动作意图与静止理由校验，阻止纯推拉冒充角色表演。真实动作质量仍须目视复核。
-- 不含口型、配音、音乐、骨骼绑定或完整逐帧动画。
+- 支持本地配音、字幕和音量驱动的简单嘴部开合；不包含精确音素口型、骨骼绑定或完整逐帧动画。
 
-新制作使用 motion_plan 0.2，其他合同保持 0.1。见 [有限动画协议](references/limited-animation.md)。旧 library 示例保留为视差回归测试；运行 `python scripts/make_acting_fixture.py ../acting-fixture` 生成固定相机下的通用抬臂/眨眼测试，再用 prepare 与 Remotion 渲染。它验证执行能力，不代表正式美术质量。
+新制作使用 `motion_plan` 0.3，其他合同保持 0.1；这是 V0.4 的兼容数据合同，不要把 Skill 发布版本和 JSON schema 版本混用。旧的 0.2 有限动画入口仍可读取，迁移规则见 [有限动画协议](references/limited-animation.md)。library 示例保留为回归测试；运行 `python scripts/make_acting_fixture.py ../acting-fixture` 生成固定相机下的通用抬臂/眨眼测试，再用 prepare 与 Remotion 渲染。它验证执行能力，不代表正式美术质量。
 
 ## 快速验证
 

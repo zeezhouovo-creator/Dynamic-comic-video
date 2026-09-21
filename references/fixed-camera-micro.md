@@ -4,7 +4,7 @@
 
 ## 数据与素材
 
-使用 motion_plan 0.2，每镜 `performance` 示例：
+使用 motion_plan 0.3，每镜 `performance` 示例：
 
 ```json
 {"mode":"fixed-camera-micro","intent":"主角保持原姿势和表情设计，仅眨眼一次、说话时嘴部小幅开合、极轻微偏头和几乎不可察觉的胸肩呼吸；发梢极轻摆动。配角基本静止，仅可偶尔眨眼。","reviewed":false}

@@ -49,6 +49,9 @@
           "transition": {
             "const": "cut"
           },
+          "timeline": {
+            "$ref": "#/$defs/timeline"
+          },
           "layers": {
             "type": "array",
             "items": {
@@ -221,6 +224,86 @@
         }
       },
       "required": ["part", "pivot", "keys"], "additionalProperties": false
+    },
+    "timeline": {
+      "type": "object",
+      "properties": {
+        "scene_id": {"type": "string", "minLength": 1},
+        "duration_frames": {"type": "integer", "minimum": 2},
+        "audio": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"},
+        "audio_start_frame": {"type": "integer", "minimum": 0},
+        "subtitle_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "start_frame": {"type": "integer", "minimum": 0},
+              "end_frame": {"type": "integer", "minimum": 1},
+              "text": {"type": "string", "minLength": 1},
+              "emphasis": {"type": "string"}
+            },
+            "required": ["start_frame", "end_frame", "text"],
+            "additionalProperties": false
+          }
+        },
+        "speech_intervals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "start_frame": {"type": "integer", "minimum": 0},
+              "end_frame": {"type": "integer", "minimum": 1},
+              "speaker": {"type": "string", "minLength": 1}
+            },
+            "required": ["start_frame", "end_frame", "speaker"],
+            "additionalProperties": false
+          }
+        },
+        "action_events": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {"$ref": "#/$defs/event"},
+              {"type": "object", "properties": {"keyword": {"type": "string"}}}
+            ]
+          }
+        },
+        "expression_events": {"$ref": "#/$defs/event_list"},
+        "blink_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "frame": {"type": "integer", "minimum": 0},
+              "description": {"type": "string", "minLength": 1}
+            },
+            "required": ["frame", "description"],
+            "additionalProperties": false
+          }
+        },
+        "sound_events": {"$ref": "#/$defs/event_list"},
+        "cut_at_frame": {"type": "integer", "minimum": 0}
+      },
+      "required": ["scene_id", "duration_frames", "subtitle_events", "speech_intervals", "action_events", "expression_events", "blink_events", "sound_events", "cut_at_frame"],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "event_id": {"type": "string", "minLength": 1},
+        "trigger": {"enum": ["speech", "information", "pause", "emotion", "action"]},
+        "start_frame": {"type": "integer", "minimum": 0},
+        "peak_frame": {"type": "integer", "minimum": 0},
+        "settle_frame": {"type": "integer", "minimum": 0},
+        "end_frame": {"type": "integer", "minimum": 0},
+        "description": {"type": "string", "minLength": 1}
+      },
+      "required": ["event_id", "trigger", "start_frame", "peak_frame", "settle_frame", "end_frame", "description"],
+      "additionalProperties": false
+    },
+    "event_list": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/event"}
     }
   }
 }

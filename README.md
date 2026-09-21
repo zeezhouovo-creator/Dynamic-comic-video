@@ -38,6 +38,22 @@ npm run render
 
 真实项目要在仓库外建立独立工作目录；用户故事、角色图片、配音和成片不提交到这个公共仓库。npm 只负责安装和运行 Remotion 渲染器，Python 负责 Skill 的校验、编译和质量闸门。
 
+### 一体化安装
+
+如果希望一次准备好 Skill、Python 校验环境和 Remotion 渲染依赖，可以在仓库根目录运行安装脚本：
+
+```powershell
+.\scripts\setup.ps1
+```
+
+脚本会把完整 Skill 安装到 `$env:USERPROFILE\.codex\skills\dynamic-comic-video`，在该目录创建本地 Python 虚拟环境，并在 `assets/remotion` 中执行 `npm ci`。macOS/Linux 使用：
+
+```bash
+bash scripts/setup.sh
+```
+
+安装后仍然把每个故事项目放在仓库之外；Skill 和渲染器是一套安装，用户内容和成片是另一套本地项目。不要把 `node_modules`、`.venv`、API Key 或用户内容提交到 GitHub。
+
 ### 从 GitHub 手动复制
 
 ```powershell

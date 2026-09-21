@@ -57,7 +57,7 @@ V0.4 仍然不承诺精确音素口型、骨骼绑定、完整逐帧动画、自
 
 ## V1.0 总控层
 
-V1.0 在 V0.4 执行层之上增加项目状态机（INIT、CHARACTER、STORY、STORYBOARD、ANIMATION、AUDIO、PERFORMANCE、COMPOSITION、QUALITY_CHECK、PREVIEW、REVISION、FINAL）、入口分流、最小提问、用户反馈路由和最小修改原则。完整规则见 [V1.0 总控系统](references/v10-control-system.md)。V1.0 当前为候选版，不改变 V0.4 的 JSON 合同、固定镜头和本地素材边界。
+V1.0 在 V0.4 执行层之上增加项目状态机（INIT、CHARACTER、STORY、STORYBOARD、ANIMATION、AUDIO、PERFORMANCE、COMPOSITION、QUALITY_CHECK、PREVIEW、REVISION、FINAL）、入口分流、最小提问、用户反馈路由和最小修改原则。需要恢复或交接项目时使用 [V1.0 项目状态机](references/project-state.md) 与 `scripts/project_state.py`。完整规则见 [V1.0 总控系统](references/v10-control-system.md)。V1.0 当前为候选版，不改变 V0.4 的 JSON 合同、固定镜头和本地素材边界。
 
 ## Repetition QC
 

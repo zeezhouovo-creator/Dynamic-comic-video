@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dynamic-comic-video:project_state:0.1",
+  "title": "project_state",
+  "type": "object",
+  "properties": {
+    "version": {"const": "0.1"},
+    "project_id": {"type": "string", "minLength": 1},
+    "state": {"enum": ["INIT", "CHARACTER", "STORY", "STORYBOARD", "ANIMATION", "AUDIO", "PERFORMANCE", "COMPOSITION", "QUALITY_CHECK", "PREVIEW", "REVISION", "FINAL"]},
+    "pending": {"type": "array", "items": {"type": "string"}},
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {"type": "string", "minLength": 1},
+          "to": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1}
+        },
+        "required": ["from", "to", "reason"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "project_id", "state", "pending", "history"],
+  "additionalProperties": false
+}

@@ -95,19 +95,34 @@ def scan(project, autofix=False):
                     report["automatic_corrections"].append({"shot": sid, "field": "timeline.duration_frames", "from": old, "to": shot["duration_frames"]})
                 else:
                     issue(report, "Major", "timeline", sid, "Timeline duration does not match shot duration", "set to shot duration")
-            if timeline.get("cut_at_frame", shot["duration_frames"]) > shot["duration_frames"]:
+            cut_at = timeline.get("cut_at_frame", shot["duration_frames"])
+            if cut_at < 0 or cut_at > shot["duration_frames"]:
                 if autofix:
-                    old = timeline["cut_at_frame"]
-                    timeline["cut_at_frame"] = shot["duration_frames"]
-                    report["automatic_corrections"].append({"shot": sid, "field": "timeline.cut_at_frame", "from": old, "to": shot["duration_frames"]})
+                    if cut_at > shot["duration_frames"]:
+                        timeline["cut_at_frame"] = shot["duration_frames"]
+                        report["automatic_corrections"].append({"shot": sid, "field": "timeline.cut_at_frame", "from": cut_at, "to": shot["duration_frames"]})
+                    else:
+                        issue(report, "Major", "cut", sid, "CUT is before the shot start")
                 else:
-                    issue(report, "Major", "cut", sid, "CUT is later than the shot duration", "clamp to shot duration")
+                    message = "CUT is later than the shot duration" if cut_at > shot["duration_frames"] else "CUT is before the shot start"
+                    issue(report, "Major", "cut", sid, message, "clamp to shot duration" if cut_at > shot["duration_frames"] else None)
             for key in ("subtitle_events", "speech_intervals", "visual_events", "music_duck_events"):
                 for event in timeline.get(key, []):
                     start = event.get("start_frame", 0)
                     end = event.get("end_frame", start + 1)
                     if start < 0 or end <= start or end > shot["duration_frames"]:
                         issue(report, "Major", "timeline", sid, f"{key} contains an out-of-bounds interval")
+            for key in ("action_events", "expression_events", "sound_events"):
+                for event in timeline.get(key, []):
+                    phases = [event.get(name) for name in ("start_frame", "peak_frame", "settle_frame", "end_frame")]
+                    if any(value is None for value in phases) or any(value < 0 or value > shot["duration_frames"] for value in phases):
+                        issue(report, "Major", "timeline", sid, f"{key} contains an out-of-bounds event phase")
+                    elif phases != sorted(phases):
+                        issue(report, "Major", "timeline", sid, f"{key} contains event phases out of order")
+            for event in timeline.get("blink_events", []):
+                frame = event.get("frame", -1)
+                if frame < 0 or frame >= shot["duration_frames"]:
+                    issue(report, "Major", "timeline", sid, "blink_events contains an out-of-bounds frame")
 
         actions = 0
         for layer in motion_shot.get("layers", []):

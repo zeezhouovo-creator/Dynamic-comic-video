@@ -27,7 +27,8 @@ npm run still -- --frame=24
 2. validate 后 compile，Agent 使用生成的提示词完成 reference 和 master。按分层协议准备实际图层和 preview。正式项目不运行 make_fixture。
 3. reference 设 ready；motion asset_mode 设 production；记录实际 review 结果。
 4. validate --assets，审阅 repetition_warnings 和图像接触表，针对性修正。
-5. prepare 指向独立 renderer，执行 npm ci 与 npm run render；复制最终视频到该任务的交付目录。
+5. 预览前运行 `python scripts/quality_gate.py <project> --autofix`，检查 `quality_report.json`；Critical/Major 问题修复后才继续。
+6. prepare 指向独立 renderer，执行 npm ci 与 npm run render；复制最终视频到该任务的交付目录。
 
 不要把 private 配置放入 renderer/public。prepare 不拷贝 `.env`、原文或 reference 到 public，仅拷贝渲染层和必要的运动元数据。
 

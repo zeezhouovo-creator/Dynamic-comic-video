@@ -43,7 +43,7 @@ V0.3 候选制作流程见 [对白时间轴、素材与逐镜重做](references/
 4. **Shot Prompt Compiler**：运行 `compile`，得到角色参考与逐镜 master 的结构化提示词。编译只整理已完成的导演决策，不创造新剧情。把 reference 作为身份参考输入图像工具，执行逐镜新绘，保存指定 `master.png`。
 5. **Master QC → Layer Planning**：先核对 master 的身份、剧情表演、构图与重复性，再确认该镜实际所需图层。根据 [分层协议](references/layer-protocol.md) 提取人物、补全背景、分离前景/特效，保存透明 PNG 与合成预览。若图像工具无法分层，明确缺少的资产并停在这一阶段；不要悄悄降级为整图推拉。
 6. **Motion Director**：新项目使用 motion_plan 0.3，先依据 [角色一致性与自然表演](references/character-consistency.md) 和 [音频驱动时间轴](references/audio-timeline.md) 建立每镜统一 `timeline`。先取得实际配音时间，再填写字幕单元、speech intervals、关键词动作触发原因、主要动作、静止时间、眨眼时间、反应停顿和 CUT，再安排准备、动作、反应、停顿。按实际对白音频和表演分配时长，不把格数当成秒数。需要重点字幕、漫画符号、音效、环境音或音乐变化时，遵循 [漫画演出与视听反馈](references/comic-performance.md)，并把事件写入同一 `timeline`。编译器输出逐镜 acting 提示词。先用 preview 渲染，检查全部关键帧及中间帧的接缝、接触、遮挡、文字和节奏，确认后填写 performance.reviewed，再设 production。素材生成失败时保存进度并明确缺图，禁止擅自降级为固定立绘推拉。
-7. **QC → Remotion → MP4**：运行素材校验、prepare、Remotion 渲染。复查所有切点前后帧和每镜首/中/末帧；报告测试/正式素材状态、时长、尺寸、遗留问题与输出位置。
+7. **质量闸门 → QC → Remotion → MP4**：预览前运行 [动态漫画质量闸门](references/quality-gate.md) 和 `scripts/quality_gate.py`，先修复 Critical/Major 问题，再运行素材校验、prepare、Remotion 渲染。复查所有切点前后帧和每镜首/中/末帧；报告测试/正式素材状态、时长、尺寸、遗留问题与输出位置。质量闸门只能自动修复安全的时间轴元数据，不能用标签或自动修正掩盖角色、场景和表演问题。
 
 数据契约见 [契约说明](references/contracts.md) 与 `schemas/*.schema.json`；可执行步骤见 [运行指南](references/runbook.md)。可选画风见 [纸片拼贴画风](references/paper-collage-style.md)。`examples/library/` 只是一个中国南方小城图书馆的原创测试样例，用来示范“视觉语言不改变内容题材”，不是技能的主题限制。
 

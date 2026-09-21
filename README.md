@@ -6,62 +6,27 @@
 
 ## 团队安装
 
-### 只安装 Skill
+项目采用一体化安装：一次安装同时得到 Agent Skill、Python 校验环境和 Remotion MP4 渲染器。团队成员不需要分别安装 Skill 和 npm 渲染项目。
 
-如果成员使用 Codex，只需要把公开 GitHub 仓库安装到自己的 Skill 目录。安装脚本会把它放到 `~/.codex/skills/dynamic-comic-video`，下一轮对话即可使用：
-
-```powershell
-python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py" `
-  --repo zeezhouovo-creator/Dynamic-comic-video `
-  --path . `
-  --name dynamic-comic-video
-```
-
-更新版本时重新执行安装，或进入已安装目录执行 `git pull`。如果团队成员使用其他 Agent 宿主，只需将仓库根目录作为 Agent Skill 导入，并确保 `SKILL.md` 位于根目录。
-
-### 需要输出 MP4
-
-Skill 规则本身不需要 npm。只有执行 Remotion 视频渲染时才需要 Node.js 和 npm：
+Windows：
 
 ```powershell
 git clone https://github.com/zeezhouovo-creator/Dynamic-comic-video.git
 Set-Location Dynamic-comic-video
-python -m venv .venv
-.\.venv\Scripts\python -m pip install -r requirements.txt
-python scripts\pipeline.py validate examples\library
-python scripts\quality_gate.py examples\library
-python scripts\pipeline.py prepare examples\library --renderer ..\manga-renderer
-Set-Location ..\manga-renderer
-npm ci
-npm run render
-```
-
-真实项目要在仓库外建立独立工作目录；用户故事、角色图片、配音和成片不提交到这个公共仓库。npm 只负责安装和运行 Remotion 渲染器，Python 负责 Skill 的校验、编译和质量闸门。
-
-### 一体化安装
-
-如果希望一次准备好 Skill、Python 校验环境和 Remotion 渲染依赖，可以在仓库根目录运行安装脚本：
-
-```powershell
 .\scripts\setup.ps1
 ```
 
-脚本会把完整 Skill 安装到 `$env:USERPROFILE\.codex\skills\dynamic-comic-video`，在该目录创建本地 Python 虚拟环境，并在 `assets/remotion` 中执行 `npm ci`。macOS/Linux 使用：
+macOS/Linux：
 
 ```bash
+git clone https://github.com/zeezhouovo-creator/Dynamic-comic-video.git
+cd Dynamic-comic-video
 bash scripts/setup.sh
 ```
 
-安装后仍然把每个故事项目放在仓库之外；Skill 和渲染器是一套安装，用户内容和成片是另一套本地项目。不要把 `node_modules`、`.venv`、API Key 或用户内容提交到 GitHub。
+安装脚本会把 Skill 放到 Codex 的 Skill 目录，在本地创建 Python 虚拟环境，并在 `assets/remotion` 中安装 npm 依赖。安装完成后，用户可以直接用 Codex 制作动态漫画，也可以进入独立项目执行校验、预览和 MP4 渲染。
 
-### 从 GitHub 手动复制
-
-```powershell
-git clone https://github.com/zeezhouovo-creator/Dynamic-comic-video.git
-Copy-Item -Recurse .\Dynamic-comic-video "$env:USERPROFILE\.codex\skills\dynamic-comic-video"
-```
-
-如果已有旧版本，使用 `git pull` 更新。每位成员都应在自己的本地环境中配置依赖和渲染器；不要把 API Key 写入仓库。
+每个故事、角色图片、配音、渲染项目和成片都保存在仓库之外。不要把 `node_modules`、`.venv`、API Key 或用户内容提交到 GitHub。更新时在仓库目录执行 `git pull`，再重新运行对应的安装脚本。
 
 ## 协作方式
 

@@ -6,12 +6,46 @@
 
 ## 团队安装
 
+### 只安装 Skill
+
+如果成员使用 Codex，只需要把公开 GitHub 仓库安装到自己的 Skill 目录。安装脚本会把它放到 `~/.codex/skills/dynamic-comic-video`，下一轮对话即可使用：
+
 ```powershell
-git clone https://github.com/zeezhouovo-creator/Dynamic-comic-video.git
-Copy-Item -Recurse .\Dynamic-comic-video "$env:USERPROFILE\.codex\skills\manga-motion-video"
+python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py" `
+  --repo zeezhouovo-creator/Dynamic-comic-video `
+  --path . `
+  --name dynamic-comic-video
 ```
 
-如果已有旧版本，先删除目标目录或使用 `git pull` 更新。每位成员都应在自己的本地环境中配置依赖和渲染器；不要把 API Key 写入仓库。
+更新版本时重新执行安装，或进入已安装目录执行 `git pull`。如果团队成员使用其他 Agent 宿主，只需将仓库根目录作为 Agent Skill 导入，并确保 `SKILL.md` 位于根目录。
+
+### 需要输出 MP4
+
+Skill 规则本身不需要 npm。只有执行 Remotion 视频渲染时才需要 Node.js 和 npm：
+
+```powershell
+git clone https://github.com/zeezhouovo-creator/Dynamic-comic-video.git
+Set-Location Dynamic-comic-video
+python -m venv .venv
+.\.venv\Scripts\python -m pip install -r requirements.txt
+python scripts\pipeline.py validate examples\library
+python scripts\quality_gate.py examples\library
+python scripts\pipeline.py prepare examples\library --renderer ..\manga-renderer
+Set-Location ..\manga-renderer
+npm ci
+npm run render
+```
+
+真实项目要在仓库外建立独立工作目录；用户故事、角色图片、配音和成片不提交到这个公共仓库。npm 只负责安装和运行 Remotion 渲染器，Python 负责 Skill 的校验、编译和质量闸门。
+
+### 从 GitHub 手动复制
+
+```powershell
+git clone https://github.com/zeezhouovo-creator/Dynamic-comic-video.git
+Copy-Item -Recurse .\Dynamic-comic-video "$env:USERPROFILE\.codex\skills\dynamic-comic-video"
+```
+
+如果已有旧版本，使用 `git pull` 更新。每位成员都应在自己的本地环境中配置依赖和渲染器；不要把 API Key 写入仓库。
 
 ## 协作方式
 

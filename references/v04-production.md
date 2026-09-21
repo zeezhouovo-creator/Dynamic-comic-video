@@ -31,7 +31,7 @@ V0.4 是 Dynamic Comic Video 的工作流版本。它把已经验证过的固定
 
 ## V0.4 验收门
 
-稳定版本前，至少用一个真实项目完成 3—5 个连续镜头，并留下以下可复查文件：
+稳定版本验收至少用一个真实项目完成 3—5 个连续镜头，并留下以下可复查文件：
 
 - `production_brief.json`、`characters.json`、`storyboard.json`、`motion_plan.json`
 - 每镜 `master`、实际使用的图层和合成预览

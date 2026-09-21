@@ -3,7 +3,7 @@ name: dynamic-comic-video
 description: Create fixed-panel sequential comic videos from original stories, lessons or explainers, with identity-consistent fresh panels, local character acting, timed dialogue and captions, simple speech-driven mouth movement and Remotion MP4 rendering. Topic-agnostic; not full frame-by-frame animation or phoneme lip sync.
 ---
 
-# Dynamic Comic Video — V0.4 candidate
+# Dynamic Comic Video — V0.4
 
 新项目先读取 [动态漫画制作向导](references/production-wizard.md)，自动判断已有素材和已知信息，只补问当前阶段缺失的内容，再由 Skill 生成或读取分镜、设计表演并输出视频。旧的固定问卷式入口不适用。
 
@@ -29,7 +29,7 @@ Skill 仓库保存能力，不保存用户作品。每次任务先在独立工�
 
 **分镜生成统一执行 [分镜生成主规则](references/storyboard-director.md)，已替换原来的五项简表和通用分镜建议。**先建立场景空间记录，再独立设计每镜的背景视图、角色表演、倾听反应及切镜因果。跨镜保持空间与角色身份，禁止机械复用背景；镜内固定机位。每镜输出用户指定的17项字段，对白后按叙事需要留反应时间。旧文中的立即切镜和配角静止建议不作为本模式通用规则。
 
-V0.4 候选制作流程见 [V0.4 制作闭环](references/v04-production.md)：在 V0.3 的固定分镜、对白时间轴和局部表演基础上，统一加入制作向导、角色一致性检查、视听事件、预览前质量闸门和一体化安装。`motion_plan` 仍使用 0.3，保持已有项目兼容；这里的 V0.4 是 Skill 工作流版本，不是新的 JSON 合同版本。发布稳定 V0.4 前，必须通过真实 3—5 镜样片验收；不能只凭夹具测试通过命名正式成片。
+V0.4 制作流程见 [V0.4 制作闭环](references/v04-production.md)：在 V0.3 的固定分镜、对白时间轴和局部表演基础上，统一加入制作向导、角色一致性检查、视听事件、预览前质量闸门和一体化安装。`motion_plan` 仍使用 0.3，保持已有项目兼容；这里的 V0.4 是 Skill 工作流版本，不是新的 JSON 合同版本。V0.4 已通过真实连续镜头样片验收；后续项目仍需按同一验收门复核。
 
 默认视频形式为 [连续分镜式动态漫画](references/sequential-comic.md)，使用 `performance.mode: sequential-comic`。独立漫画分镜、固定构图、人物表演；台词和动作后按剧情保留短暂反应，再硬切下一格。字幕跟随对白时间。复杂动作优先拆为下一张分镜。情绪重点允许漫画式夸张，日常对白保持克制。跨镜锁定角色身份与场景空间，背景构图随机位重新绘制。此模式禁用视差及镜头推拉、平移、旋转、缩放，优先于一般有限动画建议。主题可变，表现形式统一。
 

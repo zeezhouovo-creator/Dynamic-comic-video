@@ -157,10 +157,16 @@ def validate(project, assets=False, shot_id=None):
 def compile_prompts(project,data,shot_id=None):
     brief,chars,board=(data[n] for n in NAMES[:3]); lookup={c['id']:c for c in chars['characters']}
     paper_style = brief.get('style_preset') == 'paper-collage'
+    economy_profile = brief.get('render_profile', 'comic-economy') == 'comic-economy'
+    economy_addition = ('Economy comic production: clear readable line art, simplified background shapes, limited texture, '
+                        'compact visual detail, expressive faces and hands, strong silhouette readability, and efficient '
+                        'repeatable assets. Prioritize identity and acting over cinematic background detail. '
+                        'Do not imitate any named living or copyrighted comic artist or copy distinctive characters.') if economy_profile else ''
     style_addition = ('Layered paper collage illustration, tactile cut-paper edges, subtle paper fibers and print grain, '
                       'controlled registration offsets, soft contact shadows between layers, limited palette derived from '
                       'the production brief, handmade but precise silhouettes, clear readable faces and objects. Treat every '
                       'layer as a physical paper cutout; preserve a clean master composition before separation.') if paper_style else ''
+    style_addition = ' '.join(part for part in (economy_addition, style_addition) if part)
     style_avoid = (['No glossy 3D plastic','no photorealistic surface','no random torn edges over faces or text',
                     'no independent lighting per layer','no unrelated scrapbook stickers','no theme or culture substitution']
                    if paper_style else [])

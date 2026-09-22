@@ -4,7 +4,7 @@
 
 | 文件 | 所有者与主要字段 | 消费方 |
 |---|---|---|
-| production_brief.json | 原文、保留项、setting、visual_language、tone、format、assumptions | 所有阶段 |
+| production_brief.json | 原文、保留项、setting、visual_language、render_profile、tone、format、assumptions | 所有阶段 |
 | characters.json | identity 五类稳定特征；reference 路径、提示词、状态与 identity_only | 提示词编译、master QC |
 | storyboard.json | beats 原文摘录/变化/情绪；shots 动作、表情、机位、构图、连续性、master、layers | 编译器、分层、QC |
 | motion_plan.json | asset_mode、逐镜起始帧/时长、逐层变换/z、review | 素材 QC、Remotion |
@@ -18,6 +18,7 @@ Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。
 - 全图层与 master 同尺寸；人物 PNG 保留全画布透明区域，不使用紧裁 bbox。中心为变换原点，x/y 为输出画布像素，scale 为统一缩放倍率。from 是镜头首帧，to 是末帧。
 - z 越大越靠前且不得相同。background 必須唯一且最底层，其他层按实际遮挡排列。人物持有的纸条等刚性随身物可归到人物层；独立运动时才另拆。
 - V0.1 采用线性变换与硬切。scale 范围 1–1.3；脚本检查两端画布覆盖，线性插值因此不会在中间超出这个边界，但仍须目视检查实际绘制范围和遮挡孔洞。
+- `render_profile` 只控制生图细节预算：`comic-economy` 优先清晰线条、角色身份和动作可读性，`standard` 保持均衡，`high-detail` 仅在用户明确要求时使用。它不改变题材、地域、时代或叙事目的。
 
 ## 状态与检查边界
 

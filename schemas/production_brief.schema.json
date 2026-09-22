@@ -58,6 +58,10 @@
       "type": "string",
       "enum": ["paper-collage", "custom"]
     },
+    "render_profile": {
+      "type": "string",
+      "enum": ["comic-economy", "standard", "high-detail"]
+    },
     "tone": {
       "type": "string",
       "minLength": 1

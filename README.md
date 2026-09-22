@@ -47,6 +47,7 @@ bash scripts/setup.sh
 - Remotion 局部部件平移、关节旋转、透明度关键帧，以及对齐姿态图片切换；硬切和视差作为辅助。
 - 动作意图与静止理由校验，阻止纯推拉冒充角色表演。真实动作质量仍须目视复核。
 - 支持本地配音、字幕和音量驱动的简单嘴部开合；不包含精确音素口型、骨骼绑定或完整逐帧动画。
+- 提供 `comic-economy` 生图档位：以角色参考和动作可读性为先，背景适度简化，适合连续分镜批量生产。
 - 知识卡、总结卡和 CTA 是按 brief 启用的可选收束镜头，不会自动追加到每个项目。
 
 新制作使用 `motion_plan` 0.3，其他合同保持 0.1；这是 V0.4 的兼容数据合同，不要把 Skill 发布版本和 JSON schema 版本混用。旧的 0.2 有限动画入口仍可读取，迁移规则见 [有限动画协议](references/limited-animation.md)。library 示例保留为回归测试；运行 `python scripts/make_acting_fixture.py ../acting-fixture` 生成固定相机下的通用抬臂/眨眼测试，再用 prepare 与 Remotion 渲染。它验证执行能力，不代表正式美术质量。

@@ -125,6 +125,16 @@ def scan(project, autofix=False):
                     issue(report, "Major", "timeline", sid, "blink_events contains an out-of-bounds frame")
 
         actions = 0
+        visible_characters = {character.get("character_id") for character in shot.get("characters", [])}
+        speech_speakers = {
+            layer.get("acting", {}).get("speech", {}).get("speaker")
+            for layer in motion_shot.get("layers", [])
+            if layer.get("acting", {}).get("speech")
+        }
+        for cue in dialogue:
+            speaker = cue.get("speaker")
+            if speaker in visible_characters and speaker not in speech_speakers:
+                issue(report, "Major", "mouth_sync", sid, f"Visible dialogue speaker {speaker} has no speech mouth layer")
         for layer in motion_shot.get("layers", []):
             acting = layer.get("acting", {})
             actions += len(acting.get("events", []))

@@ -58,6 +58,16 @@ class QualityGateTests(unittest.TestCase):
         report = scan(self.project, autofix=True)
         self.assertTrue(any(item["category"] == "cut" and "before" in item["message"] for item in report["issues"]))
 
+    def test_visible_speaker_requires_mouth_layer(self):
+        motion = read(self.project / "motion_plan.json")
+        motion["shots"][0]["layers"] = [
+            layer for layer in motion["shots"][0]["layers"]
+            if not layer.get("acting", {}).get("speech")
+        ]
+        save(self.project / "motion_plan.json", motion)
+        report = scan(self.project)
+        self.assertTrue(any(item["category"] == "mouth_sync" and "no speech mouth layer" in item["message"] for item in report["issues"]))
+
 
 if __name__ == "__main__":
     unittest.main()

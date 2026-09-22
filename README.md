@@ -70,6 +70,14 @@ npm run render
 
 示例使用本地几何测试素材，验证数据、透明层、视差和 MP4 管线；它不是某种主题的成片。正式项目需要按 `SKILL.md`、`references/content-intake.md` 与 `references/layer-protocol.md` 在独立工作目录中生成并检查真实 master 和分层素材。
 
+如果想把校验、质量闸门、Remotion 准备和 MP4 预览合成一次执行，可以使用一体化预览脚本：
+
+```powershell
+python scripts/preview.py <独立项目目录> --renderer <项目外的渲染目录>
+```
+
+它会先运行素材校验和质量闸门，再编译提示词、准备外部 renderer、执行 Remotion，并把结果复制为项目目录下的 `preview.mp4`。首次在该 renderer 目录安装依赖时追加 `--npm-install`。渲染目录必须在项目目录之外，以免把 `node_modules` 混入用户内容目录。
+
 ## 目录
 
 ```text

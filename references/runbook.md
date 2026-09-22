@@ -30,6 +30,14 @@ npm run still -- --frame=24
 5. 预览前运行 `python scripts/quality_gate.py <project> --autofix`，检查 `quality_report.json`；Critical/Major 问题修复后才继续。
 6. prepare 指向独立 renderer，执行 npm ci 与 npm run render；复制最终视频到该任务的交付目录。
 
+也可以用一条命令执行第 4—6 步：
+
+```powershell
+python scripts/preview.py <project> --renderer <project-outside-renderer>
+```
+
+脚本会先重新校验素材、运行质量闸门，再编译、prepare、渲染，并把 `renderer/out/video.mp4` 复制为 `<project>/preview.mp4`。首次使用该 renderer 时增加 `--npm-install`。它不会上传项目文件，也不会读取或写入 API Key。
+
 不要把 private 配置放入 renderer/public。prepare 不拷贝 `.env`、原文或 reference 到 public，仅拷贝渲染层和必要的运动元数据。
 
 ## 排错

@@ -45,6 +45,8 @@ V0.4 制作流程见 [V0.4 制作闭环](references/v04-production.md)：在 V0.
 6. **Motion Director**：新项目使用 motion_plan 0.3，先依据 [角色一致性与自然表演](references/character-consistency.md) 和 [音频驱动时间轴](references/audio-timeline.md) 建立每镜统一 `timeline`。先取得实际配音时间，再填写字幕单元、speech intervals、关键词动作触发原因、主要动作、静止时间、眨眼时间、反应停顿和 CUT，再安排准备、动作、反应、停顿。按实际对白音频和表演分配时长，不把格数当成秒数。需要重点字幕、漫画符号、音效、环境音或音乐变化时，遵循 [漫画演出与视听反馈](references/comic-performance.md)，并把事件写入同一 `timeline`。编译器输出逐镜 acting 提示词。先用 preview 渲染，检查全部关键帧及中间帧的接缝、接触、遮挡、文字和节奏，确认后填写 performance.reviewed，再设 production。素材生成失败时保存进度并明确缺图，禁止擅自降级为固定立绘推拉。
 7. **质量闸门 → QC → Remotion → MP4**：预览前运行 [动态漫画质量闸门](references/quality-gate.md) 和 `scripts/quality_gate.py`，先修复 Critical/Major 问题，再运行素材校验、prepare、Remotion 渲染。复查所有切点前后帧和每镜首/中/末帧；报告测试/正式素材状态、时长、尺寸、遗留问题与输出位置。质量闸门只能自动修复安全的时间轴元数据，不能用标签或自动修正掩盖角色、场景和表演问题。
 
+正式项目可以用 `scripts/preview.py <project> --renderer <external-renderer>` 串联校验、质量闸门、提示词编译、prepare 和 Remotion 预览；它把 MP4 复制回项目目录的 `preview.mp4`，不上传用户内容。渲染器必须位于项目目录之外。
+
 数据契约见 [契约说明](references/contracts.md) 与 `schemas/*.schema.json`；可执行步骤见 [运行指南](references/runbook.md)。可选画风见 [纸片拼贴画风](references/paper-collage-style.md)。`examples/library/` 只是一个中国南方小城图书馆的原创测试样例，用来示范“视觉语言不改变内容题材”，不是技能的主题限制。
 
 ## V0.4 质量与兼容边界

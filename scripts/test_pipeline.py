@@ -39,6 +39,16 @@ class PipelineTests(unittest.TestCase):
         self.edit('motion_plan',lambda d:d['shots'][0]['layers'][0].update(asset='../secret.png'))
         self.assertTrue(validate(self.project)[1])
 
+    def test_optional_outro_card_is_accepted(self):
+        self.edit('production_brief',lambda d:d.update(outro_card={
+            'enabled': True,
+            'kind': 'knowledge',
+            'rationale': 'Explain the takeaway',
+            'shot_id': 'shot_003',
+            'duration_frames': 48,
+        }))
+        self.assertEqual(validate(self.project)[1], [])
+
 class ActingTests(PipelineTests):
     def setUp(self):
         from make_acting_fixture import build

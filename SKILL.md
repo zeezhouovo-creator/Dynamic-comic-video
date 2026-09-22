@@ -39,7 +39,7 @@ V0.4 制作流程见 [V0.4 制作闭环](references/v04-production.md)：在 V0.
 
 1. **Visual / Production Brief**：保存原文、内容保留项、文化时空、视觉语言、情绪和尺寸/帧率/总帧数为 `production_brief.json`。
 2. **Character Planning → Reference**：建立 `characters.json`，选择需要保持一致的角色，写 identity、3–5 个视觉识别锚点与身份参考提示词。使用可用图像工具生成 reference 并目视核对，再设 `status: ready`。无人物项目允许空列表。不要为了凑人物改写原文。详细身份锁定与表演前检查见 [角色一致性与自然表演](references/character-consistency.md)。
-3. **Narrative Beats → Storyboard Director**：先写 scenes 空间锚点与 beats 的原文摘录/变化，再按主规则写独立 shots 和 direction。角色身份一致、场景空间连续、背景构图随机位自然变化；明确说话与倾听表演、台词时间、微动态、音效、切镜原因与下一镜衔接。编译输出17项逐镜审阅稿。无意义的 foreground/effects 不拆。
+3. **Narrative Beats → Storyboard Director**：先写 scenes 空间锚点与 beats 的原文摘录/变化，再按主规则写独立 shots 和 direction。角色身份一致、场景空间连续、背景构图随机位自然变化；明确说话与倾听表演、台词时间、微动态、音效、切镜原因与下一镜衔接。编译输出17项逐镜审阅稿。无意义的 foreground/effects 不拆。只有用户提出需要时，才把知识卡、总结卡或 CTA 作为可选独立收束镜头加入；规则见 [可选收束卡](references/outro-card.md)。
 4. **Shot Prompt Compiler**：运行 `compile`，得到角色参考与逐镜 master 的结构化提示词。编译只整理已完成的导演决策，不创造新剧情。把 reference 作为身份参考输入图像工具，执行逐镜新绘，保存指定 `master.png`。
 5. **Master QC → Layer Planning**：先核对 master 的身份、剧情表演、构图与重复性，再确认该镜实际所需图层。根据 [分层协议](references/layer-protocol.md) 提取人物、补全背景、分离前景/特效，保存透明 PNG 与合成预览。若图像工具无法分层，明确缺少的资产并停在这一阶段；不要悄悄降级为整图推拉。
 6. **Motion Director**：新项目使用 motion_plan 0.3，先依据 [角色一致性与自然表演](references/character-consistency.md) 和 [音频驱动时间轴](references/audio-timeline.md) 建立每镜统一 `timeline`。先取得实际配音时间，再填写字幕单元、speech intervals、关键词动作触发原因、主要动作、静止时间、眨眼时间、反应停顿和 CUT，再安排准备、动作、反应、停顿。按实际对白音频和表演分配时长，不把格数当成秒数。需要重点字幕、漫画符号、音效、环境音或音乐变化时，遵循 [漫画演出与视听反馈](references/comic-performance.md)，并把事件写入同一 `timeline`。编译器输出逐镜 acting 提示词。先用 preview 渲染，检查全部关键帧及中间帧的接缝、接触、遮挡、文字和节奏，确认后填写 performance.reviewed，再设 production。素材生成失败时保存进度并明确缺图，禁止擅自降级为固定立绘推拉。

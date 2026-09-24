@@ -52,6 +52,8 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("--incremental", skill)
         self.assertIn("doctor.py", runbook)
         self.assertIn("revision add", state)
+        self.assertIn("deliver.py", skill)
+        self.assertIn("delivery_report.json", runbook)
 
 
 if __name__ == "__main__":

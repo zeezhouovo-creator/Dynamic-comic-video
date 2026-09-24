@@ -21,7 +21,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 设计人物动作 | [自然度](references/motion-naturalness.md)、[有限动画](references/limited-animation.md) | 有原因、可复核的局部动作与静止阶段 |
 | 配音、字幕、嘴型及节奏 | [音频时间轴](references/audio-timeline.md) | 实测音频驱动的统一逐镜时间轴 |
 | 强调字幕、漫画符号、音效或音乐 | [漫画演出](references/comic-performance.md) | 同一时间轴中的必要视听事件 |
-| 校验、预览与交付 | [质量闸门](references/quality-gate.md)、[运行指南](references/runbook.md) | QC 报告、可播放 MP4、视觉复核记录 |
+| 校验、预览与交付 | [质量闸门](references/quality-gate.md)、[运行指南](references/runbook.md) | QC 报告、可播放 MP4、视觉复核记录、交付报告 |
 
 写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.3"`，其余三份制作合同为 `"0.1"`；旧 0.2 动作按有限动画协议兼容，不因 Skill 升级批量改版本。
 
@@ -47,6 +47,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 4. Critical/Major 问题修复后才进入预览。自动闸门只验证可计算条件；打开 `visual_review.json` 中的图片，查看逐镜接触表、关键帧及中间帧、切点两侧，检查身份、接缝、接触、遮挡、字幕与节奏。按叙事需要保留反应时间；实际查看后使用 `python scripts/project_state.py review <project> --approve`，发现问题使用 `--reject --note`。复核清单绑定当前源文件和媒体指纹，修改输入后必须重新预览。
 5. 多镜头返工使用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录；处理后更新为 `resolved`。需要只重做变更镜头时使用 `scripts/preview.py <project> --renderer <external-renderer> --incremental`，它只更新指纹变化或缓存缺失的镜头。
 6. 新机器或 renderer 变更后先运行 `python scripts/doctor.py`；它只检查本地环境，不安装依赖、不上传项目和密钥。
+7. 视觉复核批准且返工台账清空后运行 `python scripts/deliver.py <project>`；交付闸门会用本地 `ffprobe` 验证 MP4 的可播放性、尺寸、帧率和时长，并把结果写入 `delivery_report.json`。报告为 `FAIL` 时按 `blocking_issues` 修复。
 5. 重复检查包括相邻 pose_tag、连续三镜景别/角度/构图标签和人物 PNG 哈希。标签或哈希不同不证明画面不同；合理重复写明 `repetition_exception`，不能改标签掩盖固定立绘复用。
 6. 交付说明实际完成阶段、测试/正式素材状态、时长、尺寸、输出绝对路径与剩余问题。只通过校验不能声称已渲染；存在 MP4 也不等于完成视觉验收。
 

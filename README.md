@@ -36,7 +36,7 @@ bash scripts/setup.sh
 
 默认制作固定构图的连续分镜式动态漫画。当前对外版本是 V1.0，包含项目状态识别、入口分流、最小提问、统一 Scene 路由、用户反馈定位和局部返工控制，并内置已经验证的固定机位执行闭环。旧文档中的 V0.4 是这套闭环的历史开发编号，不是与 V1.0 并列的另一版本。需要恢复或交接项目时可使用 [项目状态机](references/project-state.md)，用 `inspect` 只读判断下一阶段；它还会检查素材报告的缺失/指纹变更和视觉复核清单，避免旧 MP4 或未复核帧掩盖返工项。预览完成后用 `project_state.py review --approve` 或 `--reject --note` 记录人工结论，输入变更会自动使旧复核失效。完整总控规则见 [V1.0 总控系统](references/v10-control-system.md)，执行闭环见 [制作闭环与验收](references/v04-production.md)。V1.0 仍不是精确音素口型、自动抠图或无人审核的全自动成片。
 
-`inspect` 会报告四份生产合同的 Schema 错误和具体字段路径；`revision add/update` 保存返工台账。多镜头项目可使用 `preview.py --incremental` 按素材指纹复用未变化镜头，`doctor.py` 用于检查本地 Python、Node、npm 和 Remotion 环境。
+`inspect` 会报告四份生产合同的 Schema 错误和具体字段路径；`revision add/update` 保存返工台账。多镜头项目可使用 `preview.py --incremental` 按素材指纹复用未变化镜头，`doctor.py` 用于检查本地 Python、Node、npm 和 Remotion 环境。交付前运行 `python scripts/deliver.py <独立项目目录>`，它会生成 `delivery_report.json`，统一检查合同、质量报告、视觉复核新鲜度、未关闭返工项，以及本机 `ffprobe` 读取的 MP4 可播放性、尺寸、帧率和时长。
 
 分镜生成统一使用 [分镜生成主规则](references/storyboard-director.md)：同一空间连续、背景构图按独立机位变化、角色身份连续、说话与倾听均有表演、切镜有因果，并输出17项逐镜审阅稿。旧五项简表已替换。
 
@@ -81,6 +81,8 @@ python scripts/preview.py <独立项目目录> --renderer <项目外的渲染目
 ```
 
 它会先运行素材校验和质量闸门，再编译提示词、准备外部 renderer、执行 Remotion，并把结果复制为项目目录下的 `preview.mp4`，同时生成 `visual-review/` 首/中/末帧和 `visual_review.json`。只预览一个镜头时追加 `--shot shot_002`，输出为 `preview_shot_002.mp4`。首次在该 renderer 目录安装依赖时追加 `--npm-install`。渲染目录必须在项目目录之外，以免把 `node_modules` 混入用户内容目录。
+
+视觉复核批准后运行 `python scripts/deliver.py <独立项目目录>`。只有 `delivery_report.json` 的 `status` 为 `PASS` 才算机器检查通过；`ffprobe` 必须在本机 PATH 中。该闸门只读本地文件，不安装依赖、不上传项目或密钥。
 
 ## 目录
 

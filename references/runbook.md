@@ -63,6 +63,14 @@ python scripts/doctor.py
 python scripts/doctor.py <project> --renderer <project-outside-renderer>
 ```
 
+视觉复核批准、返工台账清空后运行交付闸门：
+
+```powershell
+python scripts/deliver.py <project>
+```
+
+它把合同校验、质量报告、视觉复核指纹、未关闭返工项与 `ffprobe` 媒体检查合并为 `<project>/delivery_report.json`。报告为 `PASS` 才算机器检查通过；`FAIL` 时按 `blocking_issues` 修复。`ffprobe` 必须可在本机 PATH 找到，闸门不会联网、安装依赖或读取云端凭据。
+
 不要把 private 配置放入 renderer/public。prepare 不拷贝 `.env`、原文或 reference 到 public，仅拷贝渲染层和必要的运动元数据。
 
 ## 排错

@@ -15,6 +15,8 @@ python scripts/quality_gate.py <project> --autofix
 
 返工反馈使用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录；未解决的返工记录会阻止状态机进入可交付阶段。
 
+视觉复核批准并关闭返工后，运行 `python scripts/deliver.py <project>` 生成 `delivery_report.json`。它再次执行合同和质量检查，验证复核清单仍绑定当前源文件，并用本机 `ffprobe` 检查 MP4 的尺寸、帧率、时长和视频流；失败时按报告中的 `blocking_issues` 处理。
+
 ## 检查层级
 
 - **Critical**：角色明显变成另一个人、严重变形、嘴型与声音严重错位、分镜顺序错误或字幕内容错误。阻止预览。

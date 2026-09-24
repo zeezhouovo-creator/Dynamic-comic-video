@@ -1,6 +1,6 @@
-# V0.1 数据契约
+# 数据契约与版本
 
-所有文件 `version: "0.1"`，同一 `project_id`，UTF-8。Schema 不允许未声明字段。JSON Schema 负责结构；`pipeline.py` 负责跨文件引用和时间/素材一致性。
+新项目的 `production_brief.json`、`characters.json`、`storyboard.json` 使用 `version: "0.1"`，`motion_plan.json` 使用 `version: "0.3"`；四份文件共享 `project_id`，编码为 UTF-8。旧运动合同按 [有限动画协议](limited-animation.md) 兼容。Schema 不允许未声明字段。JSON Schema 负责结构；`pipeline.py` 负责跨文件引用和时间/素材一致性。
 
 | 文件 | 所有者与主要字段 | 消费方 |
 |---|---|---|
@@ -17,7 +17,7 @@ Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。
 - asset/master/reference 路径相对生产项目根；只能本地相对路径，不能 URL、绝对路径、`..` 或反斜杠。准备渲染时仅复制使用的层到 renderer/public。
 - 全图层与 master 同尺寸；人物 PNG 保留全画布透明区域，不使用紧裁 bbox。中心为变换原点，x/y 为输出画布像素，scale 为统一缩放倍率。from 是镜头首帧，to 是末帧。
 - z 越大越靠前且不得相同。background 必須唯一且最底层，其他层按实际遮挡排列。人物持有的纸条等刚性随身物可归到人物层；独立运动时才另拆。
-- V0.1 采用线性变换与硬切。scale 范围 1–1.3；脚本检查两端画布覆盖，线性插值因此不会在中间超出这个边界，但仍须目视检查实际绘制范围和遮挡孔洞。
+- 旧 V0.1 线性变换路径使用 scale 1–1.3 并检查两端画布覆盖；这不是新项目的镜头运动许可。新项目依 [连续分镜模式](sequential-comic.md) 保持固定机位，局部部件关键帧与姿态切换依 [有限动画协议](limited-animation.md) 编写，实际遮挡和中间帧仍需目视复核。
 - `render_profile` 只控制生图细节预算：`comic-economy` 优先清晰线条、角色身份和动作可读性，`standard` 保持均衡，`high-detail` 仅在用户明确要求时使用。它不改变题材、地域、时代或叙事目的。
 
 ## 状态与检查边界

@@ -4,12 +4,12 @@
 
 | 文件 | 所有者与主要字段 | 消费方 |
 |---|---|---|
-| production_brief.json | 原文、保留项、setting、visual_language、render_profile、tone、format、assumptions | 所有阶段 |
+| production_brief.json | 原文、保留项、setting、visual_language、render_profile、tone、可选 content_strategy、format、assumptions | 所有阶段 |
 | characters.json | identity 五类稳定特征；reference 路径、提示词、状态与 identity_only | 提示词编译、master QC |
 | storyboard.json | beats 原文摘录/变化/情绪；shots 动作、表情、机位、构图、连续性、master、layers | 编译器、分层、QC |
 | motion_plan.json | asset_mode、逐镜起始帧/时长、逐层变换/z、review | 素材 QC、Remotion |
 
-Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。Narrative Beats 内嵌于 storyboard，合同 0.1 不另增第五个必须文件。Visual Brief 内嵌于 production brief，保持风格与内容设定分离。
+Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。Narrative Beats 内嵌于 storyboard，合同 0.1 不另增第五个必须文件。Visual Brief 内嵌于 production brief，保持风格与内容设定分离。`content_strategy` 是面向真实观众的可选内容层，字段和节奏规则见 [短视频内容策划层](content-strategy.md)；它不替代 beats、shots 或音频时间轴。
 
 ## 单位与路径
 

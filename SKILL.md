@@ -13,7 +13,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 | 当前任务 | 读取 | 本阶段结果 |
 | --- | --- | --- |
-| 新建、素材入口或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md) | 独立项目目录、brief 与明确假设 |
+| 新建、素材入口或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md)、[内容策划](references/content-strategy.md) | 独立项目目录、brief、内容策略与明确假设 |
 | 恢复已有项目 | [项目状态机](references/project-state.md) | inspect 先做 Schema 检查，再结合素材指纹、返工台账和视觉复核清单判断下一步 |
 | 建立或复核角色 | [角色一致性](references/character-consistency.md) | characters 与核对过的身份参考；无人物允许空列表 |
 | 生成或改写分镜 | [分镜主规则](references/storyboard-director.md)、[连续分镜](references/sequential-comic.md) | 场景空间、Narrative Beats、shots 与17项逐镜审阅稿 |
@@ -24,6 +24,8 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 校验、预览与交付 | [质量闸门](references/quality-gate.md)、[运行指南](references/runbook.md) | QC 报告、可播放 MP4、视觉复核记录、交付报告 |
 
 写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.3"`，其余三份制作合同为 `"0.1"`；旧 0.2 动作按有限动画协议兼容，不因 Skill 升级批量改版本。
+
+面向真实观众的视频先完成 [短视频内容策划层](references/content-strategy.md)：明确受众、平台、目标、前 1–2 秒钩子、一个核心承诺、结尾收获和可选 CTA，再把内容拆成 Narrative Beats 与 shots。没有内容策略的工程测试可以继续使用最小 brief，但不能把测试素材当成成片内容。
 
 条件模块：选择纸片拼贴时读 [画风预设](references/paper-collage-style.md)；明确固定机位微动作时读 [微动作模式](references/fixed-camera-micro.md)；要求知识卡、总结卡或 CTA 时读 [收束卡](references/outro-card.md)。发布验收才读 [制作闭环与验收](references/v04-production.md)，规划能力扩展才读 [后续优化路线](references/v05-roadmap.md)。
 

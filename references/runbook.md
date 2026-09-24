@@ -23,7 +23,7 @@ npm run still -- --frame=24
 
 ## 正式故事
 
-1. 把四份示例 JSON 复制到独立生产目录，按原文重写 brief、characters、beats、shots 与 motion；不要仅替换角色姓名。
+1. 先按 [短视频内容策划层](content-strategy.md) 确定受众、平台、钩子、核心承诺和结尾收获；再把四份示例 JSON 复制到独立生产目录，按原文重写 brief、characters、beats、shots 与 motion；不要仅替换角色姓名。
 2. validate 后 compile，Agent 使用生成的提示词完成 reference 和 master。按分层协议准备实际图层和 preview。正式项目不运行 make_fixture。
 3. reference 设 ready；motion asset_mode 设 production；记录实际 review 结果。
 4. validate --assets，审阅 repetition_warnings 和图像接触表，针对性修正。

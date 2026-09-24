@@ -19,6 +19,7 @@
 - 状态检查接入四份生产合同的完整 Schema 错误路径，并新增 `revision_log.json` 与 `revision add/update` 返工台账命令。
 - 新增 `doctor.py` 本地 Python/Node/npm/Remotion 环境诊断，以及 `preview.py --incremental` 的逐镜素材指纹缓存；缓存只生成逐镜预览，不替代全片交付渲染。
 - 新增 `deliver.py` 交付闸门：统一检查 Schema/资产、质量报告、视觉复核新鲜度、返工台账和 ffprobe MP4 元数据，并输出 `delivery_report.json`。
+- 新增可选 `content_strategy` 内容层和短视频内容策划参考：先确定受众、平台、钩子、核心承诺与结尾收获，再进入角色、分镜和动画制作。
 - 质量闸门新增可见对白角色的嘴型驱动检查，防止字幕和配音存在但人物没有可见说话表演。
 - 明确知识卡、总结卡和 CTA 只在用户提出并选择时启用，默认不追加收束卡。
 - 新增 `comic-economy` 生图档位和头部/手部/道具固定相机回归夹具，验证动态漫画的重点是可读表演而非过度精致的背景；本地测试增至 61 项。

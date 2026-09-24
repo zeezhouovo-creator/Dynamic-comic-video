@@ -66,6 +66,20 @@
       "type": "string",
       "minLength": 1
     },
+    "content_strategy": {
+      "type": "object",
+      "properties": {
+        "audience": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "enum": ["douyin", "tiktok", "youtube-shorts", "bilibili", "general"]},
+        "goal": {"type": "string", "enum": ["story", "education", "commentary", "promotion", "brand"]},
+        "hook": {"type": "string", "minLength": 1},
+        "core_promise": {"type": "string", "minLength": 1},
+        "takeaway": {"type": "string", "minLength": 1},
+        "cta": {"type": "string", "minLength": 1}
+      },
+      "required": ["audience", "platform", "goal", "hook", "core_promise", "takeaway"],
+      "additionalProperties": false
+    },
     "outro_card": {
       "type": "object",
       "properties": {

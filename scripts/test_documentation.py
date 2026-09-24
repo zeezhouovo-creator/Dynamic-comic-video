@@ -41,6 +41,7 @@ class DocumentationTests(unittest.TestCase):
 
     def test_preview_docs_expose_local_review_outputs(self):
         skill = read("SKILL.md")
+        contracts = read("references/contracts.md")
         runbook = read("references/runbook.md")
         quality = read("references/quality-gate.md")
         state = read("references/project-state.md")
@@ -54,6 +55,8 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("revision add", state)
         self.assertIn("deliver.py", skill)
         self.assertIn("delivery_report.json", runbook)
+        self.assertIn("content-strategy.md", skill)
+        self.assertIn("content_strategy", contracts)
 
 
 if __name__ == "__main__":

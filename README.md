@@ -40,6 +40,8 @@ bash scripts/setup.sh
 
 分镜生成统一使用 [分镜生成主规则](references/storyboard-director.md)：同一空间连续、背景构图按独立机位变化、角色身份连续、说话与倾听均有表演、切镜有因果，并输出17项逐镜审阅稿。旧五项简表已替换。
 
+真实发布内容先读取 [短视频内容策划层](references/content-strategy.md)，在 brief 中明确受众、平台、钩子、核心承诺和结尾收获，再进入角色与分镜制作。这样可以先解决“观众为什么继续看”，再决定画面如何动。
+
 已有能力：
 
 - `production_brief.json`、`characters.json`、`storyboard.json`、`motion_plan.json` 的严格 Schema 与跨文件检查。

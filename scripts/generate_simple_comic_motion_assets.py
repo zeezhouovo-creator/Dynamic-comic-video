@@ -54,7 +54,7 @@ def _mouth_open(image: np.ndarray, faces: list[dict], width: int, height: int) -
     for region in mouths:
         left, top, right, bottom = _box(region, width, height)
         center = ((left + right) // 2, (top + bottom) // 2)
-        axes = (max(3, round((right - left) * 0.36)), max(3, round((bottom - top) * 0.42)))
+        axes = (max(3, round((right - left) * 0.28)), max(3, round((bottom - top) * 0.33)))
         cv2.ellipse(result, center, axes, 0, 0, 360, (42, 28, 34), -1)
         tongue_center = (center[0], center[1] + max(1, axes[1] // 3))
         cv2.ellipse(

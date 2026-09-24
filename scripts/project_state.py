@@ -165,12 +165,25 @@ def inspect(project):
     if not brief.is_file():
         return {"suggested_state": "INIT", "confidence": "high", "evidence": [], "missing": ["production_brief.json"]}
     evidence.append("production_brief.json")
+    try:
+        brief_data = read(brief)
+        if not isinstance(brief_data, dict) or not brief_data.get("project_id"):
+            return {"suggested_state": "INIT", "confidence": "high", "evidence": evidence, "missing": ["valid production_brief.json"]}
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {"suggested_state": "INIT", "confidence": "high", "evidence": evidence, "missing": ["valid production_brief.json"]}
     if not chars.is_file():
         return {"suggested_state": "CHARACTER", "confidence": "high", "evidence": evidence, "missing": ["characters.json"]}
     evidence.append("characters.json")
     try:
         character_data = read(chars)
-        if any(item.get("reference", {}).get("status") != "ready" for item in character_data.get("characters", [])):
+        if not isinstance(character_data, dict) or not isinstance(character_data.get("characters"), list):
+            return {"suggested_state": "CHARACTER", "confidence": "high", "evidence": evidence, "missing": ["valid characters.json"]}
+        if any(
+            not isinstance(item, dict)
+            or not isinstance(item.get("reference"), dict)
+            or item.get("reference", {}).get("status") != "ready"
+            for item in character_data.get("characters", [])
+        ):
             return {"suggested_state": "CHARACTER", "confidence": "high", "evidence": evidence, "missing": ["ready character references"]}
     except (OSError, ValueError, json.JSONDecodeError):
         return {"suggested_state": "CHARACTER", "confidence": "high", "evidence": evidence, "missing": ["valid characters.json"]}
@@ -179,11 +192,19 @@ def inspect(project):
     evidence.append("storyboard.json")
     try:
         board_data = read(board)
+        if not isinstance(board_data, dict) or not isinstance(board_data.get("shots"), list):
+            return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": ["valid storyboard.json"]}
         shots = board_data.get("shots", [])
         if not shots:
             return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": ["storyboard shots"]}
-        if any(not item.get("direction") for item in shots):
+        if any(not isinstance(item, dict) or not item.get("direction") for item in shots):
             return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": ["independent shot direction"]}
+        if any(
+            not isinstance(item.get("dialogue", []), list)
+            or any(not isinstance(cue, dict) for cue in item.get("dialogue", []))
+            for item in shots
+        ):
+            return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": ["valid storyboard dialogue entries"]}
     except (OSError, ValueError, json.JSONDecodeError):
         return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": ["valid storyboard.json"]}
     if not motion.is_file():
@@ -191,6 +212,12 @@ def inspect(project):
     evidence.append("motion_plan.json")
     try:
         motion_data = read(motion)
+        if (
+            not isinstance(motion_data, dict)
+            or not isinstance(motion_data.get("shots", []), list)
+            or any(not isinstance(item, dict) for item in motion_data.get("shots", []))
+        ):
+            return {"suggested_state": "ANIMATION", "confidence": "high", "evidence": evidence, "missing": ["valid motion_plan.json"]}
         dialogue_audio = [cue.get("audio") for item in board_data.get("shots", []) for cue in item.get("dialogue", []) if cue.get("audio")]
         missing_audio = [name for name in dialogue_audio if not (root / name).is_file()]
         if missing_audio:
@@ -213,6 +240,8 @@ def inspect(project):
     evidence.append("quality_report.json")
     try:
         report_data = read(report)
+        if not isinstance(report_data, dict) or report_data.get("status") not in ("PASS", "PASS_WITH_NOTES", "BLOCKED", "FIX_REQUIRED"):
+            return {"suggested_state": "QUALITY_CHECK", "confidence": "high", "evidence": evidence, "missing": ["valid quality_report.json"]}
         if report_data.get("status") in ("BLOCKED", "FIX_REQUIRED"):
             return {"suggested_state": "REVISION", "confidence": "high", "evidence": evidence, "missing": ["quality gate fixes"]}
     except (OSError, ValueError, json.JSONDecodeError):

@@ -76,6 +76,13 @@ class ProjectStateInspectTests(unittest.TestCase):
         self.assertEqual(result["suggested_state"], "ANIMATION")
         self.assertIn("valid asset_report.json", result["missing"])
 
+    def test_malformed_quality_report_is_reported_instead_of_crashing(self):
+        self.seed_ready_project()
+        (self.project / "quality_report.json").write_text("[]", encoding="utf-8")
+        result = inspect(self.project)
+        self.assertEqual(result["suggested_state"], "QUALITY_CHECK")
+        self.assertIn("valid quality_report.json", result["missing"])
+
 
 if __name__ == "__main__":
     unittest.main()

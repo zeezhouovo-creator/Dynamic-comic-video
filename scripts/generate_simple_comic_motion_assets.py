@@ -36,6 +36,16 @@ def _skin_color(image: np.ndarray, box: tuple[int, int, int, int]) -> tuple[int,
     return tuple(int(value) for value in np.median(sample, axis=0))
 
 
+def _inpaint(image: np.ndarray, regions: list[list[float]], width: int, height: int) -> np.ndarray:
+    mask = np.zeros((height, width), dtype=np.uint8)
+    for region in regions:
+        left, top, right, bottom = _box(region, width, height)
+        center = ((left + right) // 2, (top + bottom) // 2)
+        axes = (max(2, (right - left) // 2), max(2, (bottom - top) // 2))
+        cv2.ellipse(mask, center, axes, 0, 0, 360, 255, -1)
+    return cv2.inpaint(image, mask, 3, cv2.INPAINT_TELEA)
+
+
 def _blink(image: np.ndarray, faces: list[dict], width: int, height: int) -> np.ndarray:
     eyes = [region for face in faces for region in face.get("eyes", [])]
     result = image.copy()
@@ -50,11 +60,11 @@ def _blink(image: np.ndarray, faces: list[dict], width: int, height: int) -> np.
 
 def _mouth_open(image: np.ndarray, faces: list[dict], width: int, height: int) -> np.ndarray:
     mouths = [face.get("mouth") for face in faces if face.get("mouth")]
-    result = image.copy()
+    result = _inpaint(image, mouths, width, height)
     for region in mouths:
         left, top, right, bottom = _box(region, width, height)
         center = ((left + right) // 2, (top + bottom) // 2)
-        axes = (max(3, round((right - left) * 0.28)), max(3, round((bottom - top) * 0.33)))
+        axes = (max(3, round((right - left) * 0.20)), max(3, round((bottom - top) * 0.22)))
         cv2.ellipse(result, center, axes, 0, 0, 360, (42, 28, 34), -1)
         tongue_center = (center[0], center[1] + max(1, axes[1] // 3))
         cv2.ellipse(

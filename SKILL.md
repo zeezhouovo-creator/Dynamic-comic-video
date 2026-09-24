@@ -17,7 +17,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 恢复已有项目 | [项目状态机](references/project-state.md) | inspect 先做 Schema 检查，再结合素材指纹、返工台账和视觉复核清单判断下一步 |
 | 建立或复核角色 | [角色一致性](references/character-consistency.md) | characters 与核对过的身份参考；无人物允许空列表 |
 | 生成或改写分镜 | [分镜主规则](references/storyboard-director.md)、[连续分镜](references/sequential-comic.md) | 场景空间、Narrative Beats、shots 与17项逐镜审阅稿 |
-| 生成 master 与分层 | [分层协议](references/layer-protocol.md)；经济档另读 [生图档位](references/comic-generation-economy.md) | 核对过的 master、对齐图层和补全背景 |
+| 生成 master 与分层 | [生图规范](references/image-generation-spec.md)、[分层协议](references/layer-protocol.md)；简化条漫画风读取 [风格预设](references/simple-comic-style.md)，经济档另读 [生图档位](references/comic-generation-economy.md) | 带追溯字段的角色参考、核对过的 master、对齐图层和补全背景 |
 | 设计人物动作 | [自然度](references/motion-naturalness.md)、[有限动画](references/limited-animation.md) | 有原因、可复核的局部动作与静止阶段 |
 | 配音、字幕、嘴型及节奏 | [音频时间轴](references/audio-timeline.md) | 实测音频驱动的统一逐镜时间轴 |
 | 强调字幕、漫画符号、音效或音乐 | [漫画演出](references/comic-performance.md) | 同一时间轴中的必要视听事件 |
@@ -27,7 +27,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 面向真实观众的视频先完成 [短视频内容策划层](references/content-strategy.md)：明确受众、平台、目标、前 1–2 秒钩子、一个核心承诺、结尾收获和可选 CTA，再把内容拆成 Narrative Beats 与 shots。没有内容策略的工程测试可以继续使用最小 brief，但不能把测试素材当成成片内容。
 
-条件模块：选择纸片拼贴时读 [画风预设](references/paper-collage-style.md)；明确固定机位微动作时读 [微动作模式](references/fixed-camera-micro.md)；要求知识卡、总结卡或 CTA 时读 [收束卡](references/outro-card.md)。发布验收才读 [制作闭环与验收](references/v04-production.md)，规划能力扩展才读 [后续优化路线](references/v05-roadmap.md)。
+条件模块：选择纸片拼贴时读 [画风预设](references/paper-collage-style.md)，选择简化搞笑条漫画风时读 [风格预设](references/simple-comic-style.md)；明确固定机位微动作时读 [微动作模式](references/fixed-camera-micro.md)；要求知识卡、总结卡或 CTA 时读 [收束卡](references/outro-card.md)。发布验收才读 [制作闭环与验收](references/v04-production.md)，规划能力扩展才读 [后续优化路线](references/v05-roadmap.md)。
 
 ## 全程保持的创作约束
 

@@ -42,6 +42,10 @@ bash scripts/setup.sh
 
 真实发布内容先读取 [短视频内容策划层](references/content-strategy.md)，在 brief 中明确受众、平台、钩子、核心承诺和结尾收获，再进入角色与分镜制作。这样可以先解决“观众为什么继续看”，再决定画面如何动。
 
+生图阶段遵循 [生图规范与提示词合同](references/image-generation-spec.md)：角色参考只锁身份，master 承担当镜构图，图层从同一 master 提取；`pipeline compile` 会给提示词写入版本、镜头 ID、参考图用途和负面约束，便于跨模型复现与返工。
+
+参考简化搞笑条漫画面时使用 `style_preset: "simple-comic"`：粗线、平涂、夸张表情、简化背景，并在画面下方预留字幕区；对白不生成气泡，统一由后期字幕层添加。
+
 已有能力：
 
 - `production_brief.json`、`characters.json`、`storyboard.json`、`motion_plan.json` 的严格 Schema 与跨文件检查。

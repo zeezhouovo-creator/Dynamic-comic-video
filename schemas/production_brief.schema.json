@@ -56,7 +56,7 @@
     },
     "style_preset": {
       "type": "string",
-      "enum": ["paper-collage", "custom"]
+      "enum": ["paper-collage", "simple-comic", "custom"]
     },
     "render_profile": {
       "type": "string",

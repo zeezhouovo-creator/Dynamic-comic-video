@@ -57,6 +57,8 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("delivery_report.json", runbook)
         self.assertIn("content-strategy.md", skill)
         self.assertIn("content_strategy", contracts)
+        self.assertIn("image-generation-spec.md", skill)
+        self.assertIn("simple-comic-style.md", skill)
 
 
 if __name__ == "__main__":

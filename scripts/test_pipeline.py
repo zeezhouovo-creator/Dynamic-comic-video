@@ -49,6 +49,17 @@ class PipelineTests(unittest.TestCase):
         }))
         self.assertEqual(validate(self.project)[1], [])
 
+    def test_simple_comic_prompt_uses_subtitle_safe_style(self):
+        from pipeline import compile_prompts
+        self.edit('production_brief',lambda d:d.update(style_preset='simple-comic'))
+        data,errors,_=validate(self.project)
+        self.assertEqual(errors,[])
+        compile_prompts(self.project,data)
+        prompt=read(self.project/'prompts/shot_001.json')
+        self.assertIn('bold clean black ink outlines',prompt['style_addition'])
+        self.assertTrue(any('speech bubbles' in item for item in prompt['negative_constraints']))
+        self.assertIn('subtitle-safe area',prompt['style_addition'])
+
 class ActingTests(PipelineTests):
     def setUp(self):
         from make_acting_fixture import build
@@ -92,6 +103,12 @@ class ActingTests(PipelineTests):
         self.assertTrue((self.project/'storyboard_review.md').is_file())
         prompt=read(self.project/'prompts/shot_001_acting.json')
         self.assertEqual(prompt['dialogue'],data['storyboard']['shots'][0]['dialogue'])
+        self.assertEqual(prompt['prompt_version'],'0.1')
+        self.assertEqual(prompt['prompt_role'],'acting_layers')
+        master=read(self.project/'prompts/shot_001.json')
+        self.assertEqual(master['prompt_role'],'master')
+        self.assertEqual(master['reference_images'][0]['use'],'identity_only')
+        self.assertIn('pose',master['do_not_copy_from_reference'])
     def test_fixed_camera_micro(self):
         def micro(d):
             for s in d['shots']:

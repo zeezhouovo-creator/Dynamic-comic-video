@@ -157,6 +157,7 @@ def validate(project, assets=False, shot_id=None):
 def compile_prompts(project,data,shot_id=None):
     brief,chars,board=(data[n] for n in NAMES[:3]); lookup={c['id']:c for c in chars['characters']}
     paper_style = brief.get('style_preset') == 'paper-collage'
+    simple_comic_style = brief.get('style_preset') == 'simple-comic'
     economy_profile = brief.get('render_profile', 'comic-economy') == 'comic-economy'
     economy_addition = ('Economy comic production: clear readable line art, simplified background shapes, limited texture, '
                         'compact visual detail, expressive faces and hands, strong silhouette readability, and efficient '
@@ -166,13 +167,29 @@ def compile_prompts(project,data,shot_id=None):
                       'controlled registration offsets, soft contact shadows between layers, limited palette derived from '
                       'the production brief, handmade but precise silhouettes, clear readable faces and objects. Treat every '
                       'layer as a physical paper cutout; preserve a clean master composition before separation.') if paper_style else ''
-    style_addition = ' '.join(part for part in (economy_addition, style_addition) if part)
+    simple_comic_addition = ('Simple 2D humorous comic illustration: bold clean black ink outlines, flat color blocks, '
+                             'limited shading, highly readable facial expressions, clear hand gestures, compact comic timing, '
+                             'simple background shapes with two to four location-defining objects, and a clean lower subtitle-safe area. '
+                             'Use the reference only for high-level visual language; do not reproduce any named comic, character, panel, dialogue or layout.') if simple_comic_style else ''
+    style_addition = ' '.join(part for part in (economy_addition, simple_comic_addition, style_addition) if part)
     style_avoid = (['No glossy 3D plastic','no photorealistic surface','no random torn edges over faces or text',
                     'no independent lighting per layer','no unrelated scrapbook stickers','no theme or culture substitution']
                    if paper_style else [])
+    if simple_comic_style:
+        style_avoid.extend(['No speech bubbles, comic lettering or generated text','no copied named-comic style or characters',
+                            'no busy background detail behind faces or subtitle area','no gradients that reduce subtitle contrast'])
     for char in chars['characters']:
         if shot_id: continue
-        save(project/'prompts'/('reference_'+char['id']+'.json'),{'task':'character_reference','identity':char['identity'],'prompt':char['reference']['prompt'],'output':char['reference']['image'],'lock':'identity_only','visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'setting':brief['setting']})
+        save(project/'prompts'/('reference_'+char['id']+'.json'),{
+            'prompt_version':'0.1','project_id':brief['project_id'],'prompt_role':'character_reference',
+            'task':'character_reference','identity':char['identity'],'prompt':char['reference']['prompt'],
+            'output':char['reference']['image'],'lock':'identity_only','reference_images':[],
+            'do_not_copy_from_reference':['pose','expression','shot_size','camera','composition'],
+            'model':None,'seed':None,'size':{'width':brief['format']['width'],'height':brief['format']['height']},
+            'visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),
+            'style_addition':style_addition,'setting':brief['setting'],
+            'negative_constraints':['no baked-in dialogue, captions, speech bubbles, logos or watermark','no identity drift','no extra fingers','no unrelated standing pose']
+        })
     panels=[]
     for s in board['shots']:
         d=s.get('direction',{}); fps=brief['format']['fps']
@@ -193,7 +210,11 @@ def compile_prompts(project,data,shot_id=None):
         shot={**shot,'scene_space':space,'adjacent_shot_context':neighbors,
             'director_rules':'Keep location geometry, lighting, time and major objects consistent while independently composing each panel from its motivated camera position. Do not reuse the same background image or zoom/crop a previous panel. Preserve character identity and accessories. Default every body part to a stable hold. Trigger one primary action only from speech, information, pause, emotion or explicit action; structure it as prepare → action → settle/hold, then return to stable state. Never use perpetual sin/cos breathing, bobbing, swaying, scaling or repeated blinking; do not animate all parts together. Design both speaking and listening reactions causally; follow incoming/outgoing state, gaze, cut reason and handoff. Hold briefly for a motivated reaction after dialogue. Comic exaggeration only at emotional peaks. The camera remains fixed inside each panel.'}
         save(project/'prompts'/(shot['id']+'_acting.json'),{
+            'prompt_version':'0.1','project_id':brief['project_id'],'shot_id':shot['id'],'prompt_role':'acting_layers',
             'task':'prepare_aligned_acting_assets','master':shot['master'],
+            'reference_images':[{'path':lookup[c['character_id']]['reference']['image'],'use':'identity_only'} for c in shot['characters']],
+            'do_not_copy_from_reference':['pose','expression','shot_size','camera','composition'],
+            'model':None,'seed':None,
             'performers':shot['characters'],'performance':plan.get('performance'),
             'layers':plan['layers'],
             'dialogue':shot.get('dialogue',[]),
@@ -202,7 +223,19 @@ def compile_prompts(project,data,shot_id=None):
             'sequential_comic_constraints':('One panel expresses one line, action or reaction. Fixed camera and composition. Animate character mouths, eyes, expressions, head, hands or simple limbs; use a new hard-cut panel for complex actions and new angles. Comic exaggeration, symbols and text effects are allowed for punchlines. Preserve character identity across panels. Subtitles follow supplied dialogue intervals. No camera motion or whole-image stretch as acting.' if (plan.get('performance') or {}).get('mode')=='sequential-comic' else None),
             'micro_performance_constraints':({'primary':'Exactly one complete blink per original comic shot; small mouth opening only during timed speech; extremely slight head turn; almost imperceptible chest/shoulder breathing; minimal hair movement. Preserve original pose and expression design.','secondary':'Remain still except optional occasional blinking. No secondary head, breathing or sway tracks.','stability':'No camera movement, whole-image stretch, large limb action, position changes, facial drift, deformed hands/feet or twisted bodies. Preserve original 2D linework.','review':'Visually count one primary blink and verify secondary stillness and anatomical stability; these are not automatically pixel-validated.'} if (plan.get('performance') or {}).get('mode')=='fixed-camera-micro' else None),
             'instructions':('Preserve the original master composition and pose. Fixed camera: no zoom, pan, rotation, scale or parallax. Animate only subtle local blinking, speech-timed mouth shapes, breathing and small head/hair/clothing motion. Keep background, identity and linework stable; no stretching or deformation. Mouth motion requires supplied dialogue timings and aligned local assets; automatic lip sync is not implemented.' if (plan.get('performance') or {}).get('mode')=='fixed-camera-micro' else 'Design anticipation, action, reaction and hold. Generate fresh pose drawings or separate joints from this shot master; fill exposed areas. Keep identity and contact points consistent. Never substitute a lineup crop or camera zoom for acting.')})
-        save(project/'prompts'/(shot['id']+'.json'),{'task':'fresh_master_composition','output':shot['master'],'canvas':brief['format'],'original_content':brief['original_content'],'preserve':brief['content_preservation'],'setting':brief['setting'],'visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),'style_addition':style_addition,'beat':next(b for b in board['beats'] if b['id']==shot['beat_id']),'shot':shot,'identity_references':[{'image':lookup[c['character_id']]['reference']['image'],'identity':lookup[c['character_id']]['identity'],'reference_scope':'face/hair/clothes/proportions only; do not copy pose or composition'} for c in shot['characters']],'negative_constraints':['Do not change cultural setting or topic','Do not paste or recycle a reference standing pose','No baked-in dialogue or captions']+style_avoid,'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.'})
+        save(project/'prompts'/(shot['id']+'.json'),{
+            'prompt_version':'0.1','project_id':brief['project_id'],'shot_id':shot['id'],'prompt_role':'master',
+            'task':'fresh_master_composition','output':shot['master'],'canvas':brief['format'],
+            'model':None,'seed':None,
+            'reference_images':[{'path':lookup[c['character_id']]['reference']['image'],'use':'identity_only'} for c in shot['characters']],
+            'do_not_copy_from_reference':['pose','expression','shot_size','camera','composition'],
+            'original_content':brief['original_content'],'preserve':brief['content_preservation'],
+            'setting':brief['setting'],'visual_language':brief['visual_language'],'style_preset':brief.get('style_preset','custom'),
+            'style_addition':style_addition,'beat':next(b for b in board['beats'] if b['id']==shot['beat_id']),
+            'shot':shot,'identity_references':[{'image':lookup[c['character_id']]['reference']['image'],'identity':lookup[c['character_id']]['identity'],'reference_scope':'identity_only: face/hair/clothes/proportions/distinctive_features; do not copy pose, expression, shot_size, camera or composition'} for c in shot['characters']],
+            'negative_constraints':['Do not change cultural setting or topic','Do not paste or recycle a reference standing pose','No baked-in dialogue, captions or speech bubbles','No extra characters, fingers or broken contact points','No camera zoom, pan, rotation, parallax or whole-image stretch']+style_avoid,
+            'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.'
+        })
 
 def main():
     parser=argparse.ArgumentParser()

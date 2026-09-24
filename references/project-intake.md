@@ -1,9 +1,19 @@
-# 新项目启动引导
+# 项目启动兼容入口
 
-新项目开始时先读取 [动态漫画制作向导](production-wizard.md)，先判断用户是否已有独立分镜、角色设定或剧情，再只询问当前必要的信息。
+本文件保留给旧引用。新任务的入口分流、最小提问和已有素材授权以 [动态漫画制作向导](production-wizard.md) 与 [V1.0 总控与恢复规则](v10-control-system.md) 为准；这里不再维护第二套制作流程。
 
-独立分镜可以作为已有镜头进入动态设计；角色立绘、三视图和设定图用于建立身份参考；画风参考用于分析视觉语言。完整漫画或四格图不是默认入口，只有用户明确选择时才识别真实格子边界并逐格评估，不能机械切割后直接当作正式动态镜头。
+启动时先判断用户提供的是独立分镜、角色参考、剧情/文案、已有项目还是单纯想法。读取对话和目录中已经明确的内容，只询问会改变题材、事实边界、素材用途或阻止下一阶段的缺项。
 
-正式流程固定为：用户原创内容 → Visual/Production Brief → Character Planning 与 Character Reference → 用户确认角色身份 → Narrative Beats → Storyboard Director → Shot Prompt Compiler → Skill 生成 Master Shot → Layer Planning → 分离/重建 background、character、foreground、effects → 基础 Motion Director/Parallax → 配音/字幕/音效 → Remotion 输出 MP4。角色身份确认前不批量生成正式分镜。
+角色参考只锁身份锚点，不锁姿势、表情、景别和构图。已有独立分镜是否成为最终 master，遵循总控的复用边界：明确授权复用时核对后保留合格素材，仅作参考时按剧情新绘，用途不明且会改变重绘成本时再询问。
 
-每镜写 `source_panel` 时，它表示 Skill 生成的 panel/master 标识，不表示用户上传的漫画图片。
+当前执行链为：
+
+```text
+用户内容 → production_brief.json → characters.json → Narrative Beats / storyboard.json
+→ master 与对齐图层 → motion_plan 0.3 → 音频/字幕/动作统一时间轴
+→ 质量闸门 → Remotion 预览/MP4 → 用户复核与局部返工
+```
+
+新项目默认 `performance.mode: sequential-comic`，固定机位，人物通过局部动作和姿态切换表演。明确要求 `fixed-camera-micro` 或其他兼容模式时才读取对应规则；不使用视差或镜头运动伪造人物动作。
+
+`source_panel` 只记录该 beat/shot 的来源标识（用户授权复用的来源图、或 Skill 生成的 panel/master）；它不是复用授权本身，也不能替代 master、图层和视觉复核。

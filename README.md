@@ -65,7 +65,7 @@ bash scripts/setup.sh
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
-.\.venv\Scripts\python scripts\test_pipeline.py
+.\.venv\Scripts\python -m unittest discover -s scripts -p "test_*.py"
 .\.venv\Scripts\python scripts\pipeline.py compile examples\library
 .\.venv\Scripts\python scripts\make_fixture.py examples\library
 .\.venv\Scripts\python scripts\pipeline.py prepare examples\library --renderer ..\manga-renderer
@@ -87,6 +87,15 @@ python scripts/preview.py <独立项目目录> --renderer <项目外的渲染目
 ```
 
 它会先运行素材校验和质量闸门，再编译提示词、准备外部 renderer、执行 Remotion，并把结果复制为项目目录下的 `preview.mp4`，同时生成 `visual-review/` 首/中/末帧和 `visual_review.json`。只预览一个镜头时追加 `--shot shot_002`，输出为 `preview_shot_002.mp4`。首次在该 renderer 目录安装依赖时追加 `--npm-install`。渲染目录必须在项目目录之外，以免把 `node_modules` 混入用户内容目录。
+
+简化条漫画风的图片优先试片可以使用本地眼睛/嘴部变体恢复有限表演：
+
+```powershell
+python scripts/generate_simple_comic_motion_assets.py <独立项目目录>
+python scripts/preview.py <独立项目目录> --simple-comic
+```
+
+这条路径保持 master 不变，只在明确的帧切换眨眼和张嘴图片；它不加入镜头推拉，也不把静态图片误报成动态表演。变体由本地 OpenCV 生成，项目素材和密钥不会上传。
 
 视觉复核批准后运行 `python scripts/deliver.py <独立项目目录>`。只有 `delivery_report.json` 的 `status` 为 `PASS` 才算机器检查通过；`ffprobe` 必须在本机 PATH 中。该闸门只读本地文件，不安装依赖、不上传项目或密钥。
 

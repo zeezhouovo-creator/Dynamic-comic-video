@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from preview import review_points, run_incremental_preview, run_preview, steps
+from preview import review_points, run_incremental_preview, run_preview, run_simple_comic_preview, steps
 
 
 class PreviewTests(unittest.TestCase):
@@ -136,6 +136,25 @@ class PreviewTests(unittest.TestCase):
             self.assertEqual(second["cache_hits"], ["shot_001"])
             self.assertGreater(first_calls, run.call_count - first_calls)
             self.assertTrue((project / "incremental_preview.json").is_file())
+
+    def test_simple_comic_preview_uses_local_renderer(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp) / "project"
+            project.mkdir()
+            (project / "production_brief.json").write_text("{}", encoding="utf-8")
+            destination = project / "preview-simple-comic-10s.mp4"
+
+            def fake_run(command, check):
+                destination.write_bytes(b"simple-comic")
+
+            with patch("preview.subprocess.run", side_effect=fake_run) as run:
+                result = run_simple_comic_preview(project)
+
+            self.assertEqual(result, destination)
+            self.assertTrue(destination.is_file())
+            self.assertIn("render_simple_comic_preview.py", str(run.call_args.args[0]))
 
 
 if __name__ == "__main__":

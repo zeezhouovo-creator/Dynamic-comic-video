@@ -34,6 +34,17 @@ do not render any text, speech balloons, captions, logos or watermark in the ima
 
 角色参考锁定脸型、发型、服装、体型和辨识锚点；每个镜头只改变剧情所需的姿势、表情、视线、景别或机位。背景可以简化，但不能改变地点事实。每个镜头先生成完整 master，再从同一 master 拆出人物、背景和必要前景层。
 
+## 局部表演
+
+简单画风不能退化成逐镜静帧。每个有对白的镜头至少规划一个可复核的嘴部开合区间；较长镜头可增加一次短眨眼。眼睛和嘴部必须使用与同一 master 对齐的局部变体，不能用整图缩放、随机漂移或循环摆动冒充表演。生成变体前保存 `simple_comic_motion.json`，其中记录角色、归一化眼/嘴区域、说话帧和眨眼帧；生成后用首帧、说话帧和眨眼帧检查接缝。
+
+```powershell
+python scripts/generate_simple_comic_motion_assets.py <project>
+python scripts/preview.py <project> --simple-comic
+```
+
+没有实际配音时，嘴部帧只能标记为估计预演；正式成片仍需用本地配音重算字幕和嘴型时间轴。
+
 ## 负面约束
 
 ```text

@@ -260,15 +260,44 @@ def run_preview(project, renderer, output=None, install=False, shot=None):
     return destination
 
 
+def run_simple_comic_preview(project, output=None, motion_config=None):
+    """Render the simple-comic finishing pass with local face acting.
+
+    This path is intentionally separate from the Remotion contract: it uses
+    approved full-frame masters plus aligned eye/mouth variants and never
+    invents a camera move.  It is useful for a quick image-first preview.
+    """
+    project = Path(project).resolve()
+    if not (project / "production_brief.json").is_file():
+        raise FileNotFoundError(f"Not a production project: {project}")
+    destination = (Path(output).resolve() if output else project / "preview-simple-comic-10s.mp4")
+    command = [sys.executable, str(ROOT / "scripts" / "render_simple_comic_preview.py"), str(project), "--output", str(destination)]
+    if motion_config:
+        command.extend(["--motion-config", str(Path(motion_config).resolve())])
+    print("RUN:", " ".join(str(part) for part in command))
+    subprocess.run(command, check=True)
+    if not destination.is_file():
+        raise FileNotFoundError(f"Simple-comic renderer did not produce {destination}")
+    return destination
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build a local Dynamic Comic MP4 preview")
     parser.add_argument("project", type=Path, help="Independent production project directory")
-    parser.add_argument("--renderer", type=Path, required=True, help="External Remotion renderer directory")
+    parser.add_argument("--renderer", type=Path, help="External Remotion renderer directory")
     parser.add_argument("--output", type=Path, help="Destination MP4; defaults to <project>/preview.mp4")
     parser.add_argument("--npm-install", action="store_true", help="Run npm ci before rendering")
     parser.add_argument("--shot", help="Render one shot and rebase its timeline to frame zero")
     parser.add_argument("--incremental", action="store_true", help="Render only changed shots into incremental-preview/")
+    parser.add_argument("--simple-comic", action="store_true", help="Use the image-first simple-comic renderer with local eye/mouth variants")
+    parser.add_argument("--motion-config", type=Path, help="Face-motion manifest for --simple-comic")
     args = parser.parse_args()
+    if args.simple_comic:
+        result = run_simple_comic_preview(args.project, args.output, args.motion_config)
+        print(json.dumps({"status": "PASS", "preview": str(result), "renderer": "simple-comic"}, ensure_ascii=False))
+        return 0
+    if not args.renderer:
+        parser.error("--renderer is required unless --simple-comic is used")
     if args.incremental:
         result = run_incremental_preview(args.project, args.renderer, args.npm_install)
         print(json.dumps({"status": "PASS", "incremental": result}, ensure_ascii=False, default=str))

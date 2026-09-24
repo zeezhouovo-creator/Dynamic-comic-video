@@ -1,4 +1,4 @@
-name: Verify V0.3 candidate pipeline
+name: Verify V1.0 dynamic-comic pipeline
 
 on:
   push:

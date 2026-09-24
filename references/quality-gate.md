@@ -11,6 +11,8 @@ python scripts/quality_gate.py <project> --autofix
 
 它会生成项目内的 `quality_report.json`。`--autofix` 只修复安全的时间轴元数据边界，例如把 `timeline.duration_frames` 与镜头时长对齐、把超出镜头的 `cut_at_frame` 截到镜头末尾；不会自动重画人物、背景或改变剧情。
 
+预览脚本另外生成 `visual_review.json` 和 `visual-review/` 图片。它们记录每个选中镜头的首帧、中帧和末帧，并将 `reviewed` 初始设为 `false`；实际查看身份、接缝、接触、遮挡、字幕和节奏后，才可以标记为已复核。图片存在不代表视觉质量通过。
+
 ## 检查层级
 
 - **Critical**：角色明显变成另一个人、严重变形、嘴型与声音严重错位、分镜顺序错误或字幕内容错误。阻止预览。

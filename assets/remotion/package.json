@@ -5,7 +5,8 @@
   "scripts": {
     "studio": "remotion studio src/index.tsx --no-open",
     "render": "remotion render src/index.tsx MangaMotion out/video.mp4 --codec=h264",
-    "still": "remotion still src/index.tsx MangaMotion out/check.png"
+    "still": "remotion still src/index.tsx MangaMotion out/check.png",
+    "still-frame": "remotion still src/index.tsx MangaMotion"
   },
   "dependencies": {
     "remotion": "4.0.526",

@@ -39,6 +39,15 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("不是当前对外版本", closure)
         self.assertNotIn("V1.0 candidate / V0.4 stable engine", readme)
 
+    def test_preview_docs_expose_local_review_outputs(self):
+        skill = read("SKILL.md")
+        runbook = read("references/runbook.md")
+        quality = read("references/quality-gate.md")
+        self.assertIn("--shot <shot_id>", skill)
+        self.assertIn("visual_review.json", skill)
+        self.assertIn("--shot shot_002", runbook)
+        self.assertIn("visual-review/", quality)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -78,7 +78,7 @@ npm run render
 python scripts/preview.py <独立项目目录> --renderer <项目外的渲染目录>
 ```
 
-它会先运行素材校验和质量闸门，再编译提示词、准备外部 renderer、执行 Remotion，并把结果复制为项目目录下的 `preview.mp4`。首次在该 renderer 目录安装依赖时追加 `--npm-install`。渲染目录必须在项目目录之外，以免把 `node_modules` 混入用户内容目录。
+它会先运行素材校验和质量闸门，再编译提示词、准备外部 renderer、执行 Remotion，并把结果复制为项目目录下的 `preview.mp4`，同时生成 `visual-review/` 首/中/末帧和 `visual_review.json`。只预览一个镜头时追加 `--shot shot_002`，输出为 `preview_shot_002.mp4`。首次在该 renderer 目录安装依赖时追加 `--npm-install`。渲染目录必须在项目目录之外，以免把 `node_modules` 混入用户内容目录。
 
 ## 目录
 

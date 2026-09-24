@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from preview import review_points, run_preview, steps
+from preview import review_points, run_incremental_preview, run_preview, steps
 
 
 class PreviewTests(unittest.TestCase):
@@ -31,6 +31,11 @@ class PreviewTests(unittest.TestCase):
         self.assertEqual(prepare_command[-2:], ["--shot", "shot_001"])
         self.assertIn("out/visual-review/shot_001_first.png", still_command)
         self.assertIn("--frame=0", still_command)
+
+    def test_steps_can_skip_preflight_for_cached_shot_render(self):
+        commands = steps(Path("C:/project"), Path("C:/renderer"), shot="shot_001", preflight=False)
+        self.assertNotIn("validate", [part for command, _ in commands for part in command])
+        self.assertTrue(any("compile" in command for command, _ in commands))
 
     def test_review_points_use_local_frames_for_shot_preview(self):
         import json
@@ -98,6 +103,39 @@ class PreviewTests(unittest.TestCase):
             self.assertTrue(all(frame["sha256"] for frame in manifest["frames"]))
             self.assertTrue(all(not frame["reviewed"] for frame in manifest["frames"]))
             self.assertEqual(run.call_count, len(steps(project, renderer, shot="shot/001", stills=review_points(project, "shot/001"))))
+
+    def test_incremental_preview_renders_then_reuses_unchanged_shot(self):
+        import json
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            project = root / "project"
+            renderer = root / "renderer"
+            project.mkdir()
+            renderer.mkdir()
+            (project / "production_brief.json").write_text("{}", encoding="utf-8")
+            (project / "motion_plan.json").write_text(json.dumps({"shots": [{
+                "shot_id": "shot_001", "start_frame": 0, "duration_frames": 6,
+            }]}), encoding="utf-8")
+            (project / "asset_report.json").write_text(json.dumps({"shots": [{
+                "shot_id": "shot_001", "fingerprint": "fp1",
+            }]}), encoding="utf-8")
+            rendered = renderer / "out"
+            review = rendered / "visual-review"
+            review.mkdir(parents=True)
+            (rendered / "video.mp4").write_bytes(b"preview")
+            for position in ("first", "middle", "last"):
+                (review / f"shot_001_{position}.png").write_bytes(position.encode())
+            with patch("preview.subprocess.run") as run:
+                first = run_incremental_preview(project, renderer)
+                first_calls = run.call_count
+                second = run_incremental_preview(project, renderer)
+            self.assertEqual(first["rendered_shots"], ["shot_001"])
+            self.assertEqual(second["rendered_shots"], [])
+            self.assertEqual(second["cache_hits"], ["shot_001"])
+            self.assertGreater(first_calls, run.call_count - first_calls)
+            self.assertTrue((project / "incremental_preview.json").is_file())
 
 
 if __name__ == "__main__":

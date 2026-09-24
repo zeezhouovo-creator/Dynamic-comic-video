@@ -13,6 +13,8 @@ python scripts/quality_gate.py <project> --autofix
 
 预览脚本另外生成 `visual_review.json` 和 `visual-review/` 图片。它们记录每个选中镜头的首帧、中帧和末帧，并将 `reviewed` 初始设为 `false`；实际查看身份、接缝、接触、遮挡、字幕和节奏后，使用 `python scripts/project_state.py review <project> --approve` 记录通过，发现问题则使用 `--reject --note "..."`。清单绑定源文件、MP4 和复核图片指纹，输入变更后旧批准会失效。图片存在不代表视觉质量通过。
 
+返工反馈使用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录；未解决的返工记录会阻止状态机进入可交付阶段。
+
 ## 检查层级
 
 - **Critical**：角色明显变成另一个人、严重变形、嘴型与声音严重错位、分镜顺序错误或字幕内容错误。阻止预览。

@@ -5,6 +5,9 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+from jsonschema import Draft202012Validator
+
+ROOT = Path(__file__).resolve().parents[1]
 
 STATES = ("INIT", "CHARACTER", "STORY", "STORYBOARD", "ANIMATION", "AUDIO", "PERFORMANCE", "COMPOSITION", "QUALITY_CHECK", "PREVIEW", "REVISION", "FINAL")
 TRANSITIONS = {
@@ -42,7 +45,6 @@ FINGERPRINT_FILES = (
     "quality_report.json",
 )
 
-
 def state_path(project):
     return Path(project).resolve() / "project_state.json"
 
@@ -78,6 +80,19 @@ def write(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def _schema_errors(name, data):
+    """Return readable contract errors for one production JSON document."""
+    schema = read(ROOT / "schemas" / f"{name}.schema.json")
+    Draft202012Validator.check_schema(schema)
+    errors = []
+    for error in Draft202012Validator(schema).iter_errors(data):
+        location = f"{name}.json"
+        for part in error.absolute_path:
+            location += f"[{part}]" if isinstance(part, int) else f".{part}"
+        errors.append(f"{location}: {error.message}")
+    return sorted(errors)
+
+
 def init(project, project_id=None):
     path = state_path(project)
     if path.exists():
@@ -111,6 +126,90 @@ def route_feedback(text):
         if any(keyword.lower() in lowered for keyword in keywords):
             return {"state": state, "module": module, "text": text}
     return {"state": "REVISION", "module": "manual_review", "text": text}
+
+
+REVISION_STATUSES = ("open", "in_progress", "resolved", "wont_fix")
+
+
+def revision_log_path(project):
+    return Path(project).resolve() / "revision_log.json"
+
+
+def _read_revision_log(project):
+    path = revision_log_path(project)
+    if not path.is_file():
+        return {"version": "0.1", "project_id": Path(project).resolve().name, "entries": []}
+    try:
+        data = read(path)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        raise ValueError("revision_log.json is not valid JSON") from error
+    if not isinstance(data, dict) or not isinstance(data.get("entries"), list):
+        raise ValueError("revision_log.json must contain an entries array")
+    return data
+
+
+def open_revision_entries(project):
+    """Return open revision entries and a readable log error, if any."""
+    try:
+        data = _read_revision_log(project)
+    except ValueError as error:
+        return [], str(error)
+    entries = [
+        item for item in data["entries"]
+        if isinstance(item, dict) and item.get("status") in ("open", "in_progress")
+    ]
+    return entries, None
+
+
+def record_revision(project, text, state=None, module=None, shot=None, status="open", note=None):
+    """Append a routed feedback item to the local revision ledger."""
+    if status not in REVISION_STATUSES:
+        raise ValueError(f"Unknown revision status: {status}")
+    root = Path(project).resolve()
+    route = route_feedback(text)
+    data = _read_revision_log(root)
+    existing_ids = {item.get("id") for item in data["entries"] if isinstance(item, dict)}
+    index = len(data["entries"]) + 1
+    entry_id = f"rev_{index:03d}"
+    while entry_id in existing_ids:
+        index += 1
+        entry_id = f"rev_{index:03d}"
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    entry = {
+        "id": entry_id,
+        "created_at": now,
+        "updated_at": now,
+        "status": status,
+        "feedback": text,
+        "state": state or route["state"],
+        "module": module or route["module"],
+        "shot": shot,
+        "source_fingerprint": source_fingerprint(root),
+    }
+    if note:
+        entry["note"] = note
+    data["entries"].append(entry)
+    write(revision_log_path(root), data)
+    return entry
+
+
+def update_revision(project, entry_id, status, note=None):
+    """Update one revision entry without changing its original feedback."""
+    if status not in REVISION_STATUSES:
+        raise ValueError(f"Unknown revision status: {status}")
+    root = Path(project).resolve()
+    data = _read_revision_log(root)
+    entry = next((item for item in data["entries"] if isinstance(item, dict) and item.get("id") == entry_id), None)
+    if entry is None:
+        raise ValueError(f"Unknown revision id: {entry_id}")
+    entry["status"] = status
+    entry["updated_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    if note is not None:
+        entry["note"] = note
+    if status in ("resolved", "wont_fix"):
+        entry["resolved_at"] = entry["updated_at"]
+    write(revision_log_path(root), data)
+    return entry
 
 
 def _resolve_preview_reference(root, reference):
@@ -183,11 +282,24 @@ def review(project, approved=False, note=None, reviewer=None):
         for frame in data["frames"]:
             frame["reviewed"] = True
         data["review_status"] = "approved"
+        for revision_id in data.get("supersedes_revisions", []):
+            try:
+                update_revision(root, revision_id, "resolved", "Resolved by approved visual review")
+            except ValueError:
+                pass
     else:
         data["review_status"] = "rejected"
         for frame in data.get("frames", []):
             if isinstance(frame, dict):
                 frame["reviewed"] = False
+        revision = record_revision(
+            root,
+            note or "Visual review rejected",
+            state="REVISION",
+            module="visual_review",
+            status="open",
+        )
+        data["revision_id"] = revision["id"]
     if note:
         data["review_notes"] = note
     data["reviewed_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -272,6 +384,9 @@ def inspect(project):
         brief_data = read(brief)
         if not isinstance(brief_data, dict) or not brief_data.get("project_id"):
             return {"suggested_state": "INIT", "confidence": "high", "evidence": evidence, "missing": ["valid production_brief.json"]}
+        schema_errors = _schema_errors("production_brief", brief_data)
+        if schema_errors:
+            return {"suggested_state": "INIT", "confidence": "high", "evidence": evidence, "missing": schema_errors, "schema_errors": schema_errors}
     except (OSError, ValueError, json.JSONDecodeError):
         return {"suggested_state": "INIT", "confidence": "high", "evidence": evidence, "missing": ["valid production_brief.json"]}
     if not chars.is_file():
@@ -281,6 +396,9 @@ def inspect(project):
         character_data = read(chars)
         if not isinstance(character_data, dict) or not isinstance(character_data.get("characters"), list):
             return {"suggested_state": "CHARACTER", "confidence": "high", "evidence": evidence, "missing": ["valid characters.json"]}
+        schema_errors = _schema_errors("characters", character_data)
+        if schema_errors:
+            return {"suggested_state": "CHARACTER", "confidence": "high", "evidence": evidence, "missing": schema_errors, "schema_errors": schema_errors}
         if any(
             not isinstance(item, dict)
             or not isinstance(item.get("reference"), dict)
@@ -297,6 +415,9 @@ def inspect(project):
         board_data = read(board)
         if not isinstance(board_data, dict) or not isinstance(board_data.get("shots"), list):
             return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": ["valid storyboard.json"]}
+        schema_errors = _schema_errors("storyboard", board_data)
+        if schema_errors:
+            return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": schema_errors, "schema_errors": schema_errors}
         shots = board_data.get("shots", [])
         if not shots:
             return {"suggested_state": "STORYBOARD", "confidence": "high", "evidence": evidence, "missing": ["storyboard shots"]}
@@ -321,6 +442,9 @@ def inspect(project):
             or any(not isinstance(item, dict) for item in motion_data.get("shots", []))
         ):
             return {"suggested_state": "ANIMATION", "confidence": "high", "evidence": evidence, "missing": ["valid motion_plan.json"]}
+        schema_errors = _schema_errors("motion_plan", motion_data)
+        if schema_errors:
+            return {"suggested_state": "ANIMATION", "confidence": "high", "evidence": evidence, "missing": schema_errors, "schema_errors": schema_errors}
         dialogue_audio = [cue.get("audio") for item in board_data.get("shots", []) for cue in item.get("dialogue", []) if cue.get("audio")]
         missing_audio = [name for name in dialogue_audio if not (root / name).is_file()]
         if missing_audio:
@@ -338,6 +462,19 @@ def inspect(project):
             if any(item.startswith("missing assets:") for item in asset_issues):
                 return {"suggested_state": "ANIMATION", "confidence": "high", "evidence": evidence, "missing": asset_issues}
             return {"suggested_state": "ANIMATION", "confidence": "medium", "evidence": evidence, "missing": asset_issues}
+    open_revisions, revision_error = open_revision_entries(root)
+    if revision_error:
+        evidence.append("revision_log.json")
+        return {"suggested_state": "REVISION", "confidence": "high", "evidence": evidence, "missing": [revision_error]}
+    if open_revisions:
+        evidence.append("revision_log.json")
+        return {
+            "suggested_state": "REVISION",
+            "confidence": "high",
+            "evidence": evidence,
+            "missing": [f"{item.get('id', 'revision')}: {item.get('feedback', 'open revision')}" for item in open_revisions],
+            "revisions": open_revisions,
+        }
     if not report.is_file():
         return {"suggested_state": "QUALITY_CHECK", "confidence": "medium", "evidence": evidence, "missing": ["quality_report.json"]}
     evidence.append("quality_report.json")
@@ -398,6 +535,21 @@ def main():
     review_group.add_argument("--reject", action="store_true")
     p_review.add_argument("--note")
     p_review.add_argument("--reviewer")
+    p_revision = sub.add_parser("revision")
+    revision_sub = p_revision.add_subparsers(dest="revision_command", required=True)
+    p_revision_add = revision_sub.add_parser("add")
+    p_revision_add.add_argument("project", type=Path)
+    p_revision_add.add_argument("--text", required=True)
+    p_revision_add.add_argument("--state", choices=STATES)
+    p_revision_add.add_argument("--module")
+    p_revision_add.add_argument("--shot")
+    p_revision_add.add_argument("--status", choices=REVISION_STATUSES, default="open")
+    p_revision_add.add_argument("--note")
+    p_revision_update = revision_sub.add_parser("update")
+    p_revision_update.add_argument("project", type=Path)
+    p_revision_update.add_argument("entry_id")
+    p_revision_update.add_argument("--status", choices=REVISION_STATUSES, required=True)
+    p_revision_update.add_argument("--note")
     p_inspect = sub.add_parser("inspect")
     p_inspect.add_argument("project", type=Path)
     args = parser.parse_args()
@@ -411,6 +563,11 @@ def main():
         value = route_feedback(args.text)
     elif args.command == "review":
         value = review(args.project, approved=args.approve, note=args.note, reviewer=args.reviewer)
+    elif args.command == "revision":
+        if args.revision_command == "add":
+            value = record_revision(args.project, args.text, args.state, args.module, args.shot, args.status, args.note)
+        else:
+            value = update_revision(args.project, args.entry_id, args.status, args.note)
     else:
         value = inspect(args.project)
     print(json.dumps(value, ensure_ascii=False, indent=2))

@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from project_state import init, route_feedback, transition
+from project_state import init, open_revision_entries, record_revision, route_feedback, transition, update_revision
 
 
 class ProjectStateTests(unittest.TestCase):
@@ -44,6 +44,17 @@ class ProjectStateTests(unittest.TestCase):
 
     def test_unknown_feedback_requires_manual_revision(self):
         self.assertEqual(route_feedback("我觉得有点怪" )["state"], "REVISION")
+
+    def test_revision_log_routes_and_updates_feedback(self):
+        entry = record_revision(self.project, "字幕太快", shot="shot_002")
+        self.assertEqual(entry["module"], "subtitle_sync")
+        self.assertEqual(entry["shot"], "shot_002")
+        open_items, error = open_revision_entries(self.project)
+        self.assertIsNone(error)
+        self.assertEqual([item["id"] for item in open_items], [entry["id"]])
+        updated = update_revision(self.project, entry["id"], "resolved", "已重新预览")
+        self.assertEqual(updated["status"], "resolved")
+        self.assertEqual(open_revision_entries(self.project)[0], [])
 
 
 if __name__ == "__main__":

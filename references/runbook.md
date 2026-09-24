@@ -48,6 +48,21 @@ python scripts/preview.py <project> --renderer <project-outside-renderer>
 
 脚本会先重新校验素材、运行质量闸门，再编译、prepare、渲染，并把 `renderer/out/video.mp4` 复制为 `<project>/preview.mp4`，同时把首/中/末帧复制到 `<project>/visual-review/` 并写入带指纹的 `visual_review.json`。打开这些帧完成检查后，运行 `python scripts/project_state.py review <project> --approve`；发现问题运行 `--reject --note "..."`。只预览单镜头时追加 `--shot shot_002`；首次使用该 renderer 时增加 `--npm-install`。它不会上传项目文件，也不会读取或写入 API Key。
 
+如果只需要更新改过的镜头，可以运行：
+
+```powershell
+python scripts/preview.py <project> --renderer <project-outside-renderer> --incremental
+```
+
+它会把每个镜头的 MP4 和首/中/末帧放入 `<project>/incremental-preview/`，并写入 `incremental_preview.json`。未变化镜头按素材指纹复用缓存；该模式生成的是逐镜缓存，不替代完整全片 MP4，交付前仍需运行普通预览命令。
+
+新环境先运行：
+
+```powershell
+python scripts/doctor.py
+python scripts/doctor.py <project> --renderer <project-outside-renderer>
+```
+
 不要把 private 配置放入 renderer/public。prepare 不拷贝 `.env`、原文或 reference 到 public，仅拷贝渲染层和必要的运动元数据。
 
 ## 排错

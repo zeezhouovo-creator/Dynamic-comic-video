@@ -14,7 +14,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 当前任务 | 读取 | 本阶段结果 |
 | --- | --- | --- |
 | 新建、素材入口或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md) | 独立项目目录、brief 与明确假设 |
-| 恢复已有项目 | [项目状态机](references/project-state.md) | 只读 inspect，结合结构文件、素材指纹和视觉复核清单判断下一步 |
+| 恢复已有项目 | [项目状态机](references/project-state.md) | inspect 先做 Schema 检查，再结合素材指纹、返工台账和视觉复核清单判断下一步 |
 | 建立或复核角色 | [角色一致性](references/character-consistency.md) | characters 与核对过的身份参考；无人物允许空列表 |
 | 生成或改写分镜 | [分镜主规则](references/storyboard-director.md)、[连续分镜](references/sequential-comic.md) | 场景空间、Narrative Beats、shots 与17项逐镜审阅稿 |
 | 生成 master 与分层 | [分层协议](references/layer-protocol.md)；经济档另读 [生图档位](references/comic-generation-economy.md) | 核对过的 master、对齐图层和补全背景 |
@@ -45,6 +45,8 @@ description: Create and revise sequential motion-comic videos from stories, scri
 2. 核对角色、master、图层及实际运动范围后才填写 `ready`、`review` 或 `performance.reviewed`。fixture 只用于管线测试，不得改标签冒充正式素材。
 3. 预览可用 `scripts/preview.py <project> --renderer <external-renderer>`；单镜头可追加 `--shot <shot_id>`，输出默认为 `preview_<shot_id>.mp4`。流程执行素材校验、质量闸门安全修正、再校验、编译、prepare 和 Remotion 渲染；首次安装 renderer 依赖才追加 `--npm-install`。每次预览还会把首/中/末帧复制到 `<project>/visual-review/`，并写入 `visual_review.json`。
 4. Critical/Major 问题修复后才进入预览。自动闸门只验证可计算条件；打开 `visual_review.json` 中的图片，查看逐镜接触表、关键帧及中间帧、切点两侧，检查身份、接缝、接触、遮挡、字幕与节奏。按叙事需要保留反应时间；实际查看后使用 `python scripts/project_state.py review <project> --approve`，发现问题使用 `--reject --note`。复核清单绑定当前源文件和媒体指纹，修改输入后必须重新预览。
+5. 多镜头返工使用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录；处理后更新为 `resolved`。需要只重做变更镜头时使用 `scripts/preview.py <project> --renderer <external-renderer> --incremental`，它只更新指纹变化或缓存缺失的镜头。
+6. 新机器或 renderer 变更后先运行 `python scripts/doctor.py`；它只检查本地环境，不安装依赖、不上传项目和密钥。
 5. 重复检查包括相邻 pose_tag、连续三镜景别/角度/构图标签和人物 PNG 哈希。标签或哈希不同不证明画面不同；合理重复写明 `repetition_exception`，不能改标签掩盖固定立绘复用。
 6. 交付说明实际完成阶段、测试/正式素材状态、时长、尺寸、输出绝对路径与剩余问题。只通过校验不能声称已渲染；存在 MP4 也不等于完成视觉验收。
 

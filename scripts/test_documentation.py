@@ -49,6 +49,9 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("--shot shot_002", runbook)
         self.assertIn("visual-review/", quality)
         self.assertIn("review <project> --approve", state)
+        self.assertIn("--incremental", skill)
+        self.assertIn("doctor.py", runbook)
+        self.assertIn("revision add", state)
 
 
 if __name__ == "__main__":

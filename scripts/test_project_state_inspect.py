@@ -1,10 +1,11 @@
 """Tests for read-only workflow state inspection."""
 import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
-from project_state import file_sha256, inspect, review, source_fingerprint
+from project_state import file_sha256, inspect, record_revision, review, source_fingerprint
 
 
 class ProjectStateInspectTests(unittest.TestCase):
@@ -20,10 +21,29 @@ class ProjectStateInspectTests(unittest.TestCase):
         (self.project / name).write_text(json.dumps(value), encoding="utf-8")
 
     def seed_ready_project(self):
-        self.write("production_brief.json", {"project_id": "demo"})
-        self.write("characters.json", {"characters": [{"id": "lin", "reference": {"status": "ready"}}]})
-        self.write("storyboard.json", {"shots": [{"id": "s1", "direction": {"scene_id": "scene"}}]})
-        self.write("motion_plan.json", {"asset_mode": "fixture", "shots": [{"shot_id": "s1"}]})
+        source = Path(__file__).resolve().parents[1] / "examples" / "library"
+        shutil.copytree(source, self.project, dirs_exist_ok=True)
+        characters = json.loads((self.project / "characters.json").read_text(encoding="utf-8"))
+        characters["characters"][0]["reference"]["status"] = "ready"
+        self.write("characters.json", characters)
+        storyboard = json.loads((self.project / "storyboard.json").read_text(encoding="utf-8"))
+        shot_ids = [shot["id"] for shot in storyboard["shots"]]
+        for index, shot in enumerate(storyboard["shots"]):
+            shot["direction"] = {
+                "scene_id": "scene",
+                "camera_position": "eye_level",
+                "background_view": "library",
+                "view_id": f"view_{index + 1}",
+                "incoming_state": "stable",
+                "outgoing_state": "stable",
+                "micro_actions": "none",
+                "cut_reason": "continue",
+                "next_shot_id": shot_ids[index + 1] if index + 1 < len(shot_ids) else None,
+                "handoff": "continue",
+                "reaction_hold_frames": 0,
+                "listening_reactions": [],
+            }
+        self.write("storyboard.json", storyboard)
 
     def test_empty_project_is_init(self):
         result = inspect(self.project)
@@ -31,13 +51,15 @@ class ProjectStateInspectTests(unittest.TestCase):
 
     def test_brief_without_characters_needs_character_stage(self):
         self.write("production_brief.json", {"project_id": "demo"})
-        self.assertEqual(inspect(self.project)["suggested_state"], "CHARACTER")
+        result = inspect(self.project)
+        self.assertEqual(result["suggested_state"], "INIT")
+        self.assertTrue(result["schema_errors"])
 
     def test_invalid_quality_report_routes_to_quality_check(self):
         self.write("production_brief.json", {"project_id": "demo"})
         self.write("characters.json", {"characters": []})
         self.write("storyboard.json", {"shots": [{"id": "s1", "direction": {}}]})
-        self.assertEqual(inspect(self.project)["suggested_state"], "STORYBOARD")
+        self.assertEqual(inspect(self.project)["suggested_state"], "INIT")
 
     def test_changed_asset_report_routes_back_to_animation(self):
         self.seed_ready_project()
@@ -101,7 +123,7 @@ class ProjectStateInspectTests(unittest.TestCase):
         review(self.project, note="shot_001 接缝明显")
         result = inspect(self.project)
         self.assertEqual(result["suggested_state"], "REVISION")
-        self.assertEqual(result["missing"], ["shot_001 接缝明显"])
+        self.assertIn("rev_001: shot_001 接缝明显", result["missing"])
 
     def test_approval_refuses_stale_source(self):
         self.seed_review_project()
@@ -112,10 +134,19 @@ class ProjectStateInspectTests(unittest.TestCase):
     def test_approved_review_becomes_stale_after_source_edit(self):
         self.seed_review_project()
         review(self.project, approved=True)
-        self.write("motion_plan.json", {"asset_mode": "fixture", "shots": [{"shot_id": "s1", "changed": True}]})
+        motion = json.loads((self.project / "motion_plan.json").read_text(encoding="utf-8"))
+        motion["asset_mode"] = "preview"
+        self.write("motion_plan.json", motion)
         result = inspect(self.project)
         self.assertEqual(result["suggested_state"], "PREVIEW")
         self.assertIn("visual review source fingerprint is stale", result["missing"])
+
+    def test_open_revision_log_takes_priority(self):
+        self.seed_review_project()
+        entry = record_revision(self.project, "shot_001 动作太僵", shot="shot_001")
+        result = inspect(self.project)
+        self.assertEqual(result["suggested_state"], "REVISION")
+        self.assertIn(entry["id"] + ": shot_001 动作太僵", result["missing"])
 
     def test_malformed_evidence_is_reported_instead_of_crashing(self):
         self.seed_ready_project()

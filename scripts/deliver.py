@@ -202,18 +202,26 @@ def _check_media(root, contract_check, visual_check):
     expected = (brief.get("format") or {}) if isinstance(brief, dict) else {}
     errors = []
     for key in ("width", "height"):
-        if expected.get(key) is not None and metadata.get(key) != expected[key]:
+        if metadata.get(key) is None:
+            errors.append(f"MP4 metadata missing {key}")
+        elif expected.get(key) is not None and metadata.get(key) != expected[key]:
             errors.append(f"MP4 {key}={metadata.get(key)}; expected {expected[key]}")
     expected_fps = _fps(expected.get("fps"))
-    if expected_fps and metadata.get("fps") is not None and abs(metadata["fps"] - expected_fps) > 0.01:
-        errors.append(f"MP4 fps={metadata['fps']}; expected {expected_fps}")
+    if expected_fps:
+        if metadata.get("fps") is None:
+            errors.append("MP4 metadata missing fps")
+        elif abs(metadata["fps"] - expected_fps) > 0.01:
+            errors.append(f"MP4 fps={metadata['fps']}; expected {expected_fps}")
     duration_frames = expected.get("duration_frames")
     duration = metadata.get("duration_seconds")
-    if duration_frames is not None and expected_fps and duration is not None:
-        expected_duration = float(duration_frames) / expected_fps
-        tolerance = max(0.08, 1.0 / expected_fps + 0.03)
-        if abs(duration - expected_duration) > tolerance:
-            errors.append(f"MP4 duration={duration:.3f}s; expected {expected_duration:.3f}s ± {tolerance:.3f}s")
+    if duration_frames is not None and expected_fps:
+        if duration is None:
+            errors.append("MP4 metadata missing duration")
+        else:
+            expected_duration = float(duration_frames) / expected_fps
+            tolerance = max(0.08, 1.0 / expected_fps + 0.03)
+            if abs(duration - expected_duration) > tolerance:
+                errors.append(f"MP4 duration={duration:.3f}s; expected {expected_duration:.3f}s ± {tolerance:.3f}s")
     if errors:
         return {
             "name": "media",

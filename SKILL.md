@@ -14,7 +14,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 当前任务 | 读取 | 本阶段结果 |
 | --- | --- | --- |
 | 新建、素材入口或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md) | 独立项目目录、brief 与明确假设 |
-| 恢复已有项目 | [项目状态机](references/project-state.md) | 只读 inspect，结合实际文件和未完成反馈判断下一步 |
+| 恢复已有项目 | [项目状态机](references/project-state.md) | 只读 inspect，结合结构文件、素材指纹和视觉复核清单判断下一步 |
 | 建立或复核角色 | [角色一致性](references/character-consistency.md) | characters 与核对过的身份参考；无人物允许空列表 |
 | 生成或改写分镜 | [分镜主规则](references/storyboard-director.md)、[连续分镜](references/sequential-comic.md) | 场景空间、Narrative Beats、shots 与17项逐镜审阅稿 |
 | 生成 master 与分层 | [分层协议](references/layer-protocol.md)；经济档另读 [生图档位](references/comic-generation-economy.md) | 核对过的 master、对齐图层和补全背景 |

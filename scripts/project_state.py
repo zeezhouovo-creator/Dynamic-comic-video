@@ -79,6 +79,76 @@ def route_feedback(text):
     return {"state": "REVISION", "module": "manual_review", "text": text}
 
 
+def _asset_report_issues(root, report_path):
+    """Return machine-checkable asset report issues without trusting its summary."""
+    if not report_path.is_file():
+        return None, []
+    try:
+        data = read(report_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return None, ["valid asset_report.json"]
+    if not isinstance(data, dict):
+        return data, ["valid asset_report.json"]
+    shots = data.get("shots")
+    if not isinstance(shots, list):
+        return data, ["valid asset_report.json shots"]
+    issues = []
+    changed = []
+    missing = []
+    for item in shots:
+        if not isinstance(item, dict) or not item.get("shot_id"):
+            issues.append("valid asset_report.json shot entries")
+            continue
+        shot_id = item["shot_id"]
+        if item.get("changed"):
+            changed.append(shot_id)
+        for path in item.get("missing", []) or []:
+            missing.append(f"{shot_id}: {path}")
+    if missing:
+        issues.append("missing assets: " + ", ".join(missing))
+    if changed:
+        issues.append("asset fingerprint review: " + ", ".join(changed))
+    return data, issues
+
+
+def _visual_review_issues(root, review_path, preview_path):
+    """Check that the generated visual review manifest still matches the preview."""
+    if not review_path.is_file():
+        return ["visual_review.json"]
+    try:
+        data = read(review_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return ["valid visual_review.json"]
+    if not isinstance(data, dict):
+        return ["valid visual_review.json"]
+    issues = []
+    if not isinstance(data.get("frames"), list) or not data["frames"]:
+        issues.append("visual review frames")
+    else:
+        for frame in data["frames"]:
+            if not isinstance(frame, dict) or not frame.get("image"):
+                issues.append("valid visual review frame entries")
+                continue
+            image = Path(frame["image"])
+            try:
+                image_path = (root / image).resolve()
+                image_path.relative_to(root)
+            except (OSError, TypeError, ValueError):
+                issues.append(f"safe visual review image path: {frame.get('image')}")
+                continue
+            if not image_path.is_file():
+                issues.append(f"visual review image: {frame['image']}")
+            if not frame.get("reviewed"):
+                issues.append(f"review frame not checked: {frame.get('shot_id', '?')} {frame.get('position', '?')}")
+    if not data.get("preview"):
+        issues.append("visual review preview reference")
+    if data.get("review_status") != "approved":
+        issues.append("visual_review.json review_status=approved")
+    if preview_path and data.get("preview") and data["preview"] != preview_path.name:
+        issues.append("visual review matches current preview")
+    return issues
+
+
 def inspect(project):
     """Suggest the next workflow state from observable project files only."""
     root = Path(project).resolve()
@@ -88,7 +158,9 @@ def inspect(project):
     chars = root / "characters.json"
     board = root / "storyboard.json"
     motion = root / "motion_plan.json"
+    assets = root / "asset_report.json"
     report = root / "quality_report.json"
+    visual_review = root / "visual_review.json"
     previews = list(root.glob("*.mp4")) + list(root.glob("**/out/*.mp4"))
     if not brief.is_file():
         return {"suggested_state": "INIT", "confidence": "high", "evidence": [], "missing": ["production_brief.json"]}
@@ -127,6 +199,15 @@ def inspect(project):
             return {"suggested_state": "QUALITY_CHECK", "confidence": "medium", "evidence": evidence, "missing": ["master visual review"]}
     except (OSError, ValueError, json.JSONDecodeError):
         return {"suggested_state": "ANIMATION", "confidence": "high", "evidence": evidence, "missing": ["valid motion_plan.json"]}
+    if assets.is_file():
+        asset_data, asset_issues = _asset_report_issues(root, assets)
+        evidence.append("asset_report.json")
+        if asset_issues:
+            if asset_data is None or any(item.startswith("valid asset_report") for item in asset_issues):
+                return {"suggested_state": "ANIMATION", "confidence": "high", "evidence": evidence, "missing": asset_issues}
+            if any(item.startswith("missing assets:") for item in asset_issues):
+                return {"suggested_state": "ANIMATION", "confidence": "high", "evidence": evidence, "missing": asset_issues}
+            return {"suggested_state": "ANIMATION", "confidence": "medium", "evidence": evidence, "missing": asset_issues}
     if not report.is_file():
         return {"suggested_state": "QUALITY_CHECK", "confidence": "medium", "evidence": evidence, "missing": ["quality_report.json"]}
     evidence.append("quality_report.json")
@@ -139,6 +220,13 @@ def inspect(project):
     if not previews:
         return {"suggested_state": "COMPOSITION", "confidence": "medium", "evidence": evidence, "missing": ["preview MP4"]}
     evidence.append("preview MP4")
+    current_preview = next((path for path in previews if path.parent == root), None)
+    review_issues = _visual_review_issues(root, visual_review, current_preview)
+    if review_issues:
+        if visual_review.is_file():
+            evidence.append("visual_review.json")
+        return {"suggested_state": "PREVIEW", "confidence": "high", "evidence": evidence, "missing": review_issues + ["FINAL is never inferred"]}
+    evidence.append("visual_review.json")
     return {"suggested_state": "PREVIEW", "confidence": "medium", "evidence": evidence, "missing": ["user review; FINAL is never inferred"]}
 
 

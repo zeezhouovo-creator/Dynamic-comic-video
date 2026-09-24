@@ -16,7 +16,7 @@ python scripts/project_state.py route-feedback "字幕太快"
 
 状态只能沿允许的路径流转；用户反馈通常先进入 `REVISION`，再回到实际需要返工的阶段。`route-feedback` 只给出建议，不直接修改项目文件。
 
-`inspect` 是只读检查：根据项目文件给出建议阶段和缺失项。它不会推断 `FINAL`，因为最终确认必须来自用户，而不是文件是否存在。
+`inspect` 是只读检查：根据项目文件给出建议阶段和缺失项。除了检查 brief、角色、分镜、时间轴和质量报告，它还会读取 `asset_report.json` 的缺失项与指纹变更，以及 `visual_review.json` 的图片路径、逐帧 `reviewed` 标记和 `review_status`。素材缺失或指纹仍待核对时回到 `ANIMATION`；视觉清单不完整或未批准时停在 `PREVIEW`。它不会推断 `FINAL`，因为最终确认必须来自用户，而不是文件是否存在。
 
 ## 与制作文件的关系
 

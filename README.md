@@ -32,9 +32,9 @@ bash scripts/setup.sh
 
 日常修改请从 `main` 创建分支并提交 Pull Request。提交前运行 [贡献指南](CONTRIBUTING.md) 中的测试。版本变化记录在 [CHANGELOG.md](CHANGELOG.md)，稳定版本使用 Git tag 标记。
 
-## V1.0 candidate / V0.4 stable engine
+## V1.0 workflow
 
-默认制作固定构图的连续分镜式动态漫画。V0.4 是已验收的执行引擎；V1.0 在其上增加项目状态识别、入口分流、最小提问、统一 Scene 路由、用户反馈定位和局部返工控制。需要恢复或交接项目时可使用 [项目状态机](references/project-state.md)，用 `inspect` 只读判断下一阶段。完整总控规则见 [V1.0 总控系统](references/v10-control-system.md)，执行闭环见 [V0.4 制作闭环](references/v04-production.md)。V1.0 仍不是精确音素口型、自动抠图或无人审核的全自动成片。
+默认制作固定构图的连续分镜式动态漫画。当前对外版本是 V1.0，包含项目状态识别、入口分流、最小提问、统一 Scene 路由、用户反馈定位和局部返工控制，并内置已经验证的固定机位执行闭环。旧文档中的 V0.4 是这套闭环的历史开发编号，不是与 V1.0 并列的另一版本。需要恢复或交接项目时可使用 [项目状态机](references/project-state.md)，用 `inspect` 只读判断下一阶段。完整总控规则见 [V1.0 总控系统](references/v10-control-system.md)，执行闭环见 [制作闭环与验收](references/v04-production.md)。V1.0 仍不是精确音素口型、自动抠图或无人审核的全自动成片。
 
 分镜生成统一使用 [分镜生成主规则](references/storyboard-director.md)：同一空间连续、背景构图按独立机位变化、角色身份连续、说话与倾听均有表演、切镜有因果，并输出17项逐镜审阅稿。旧五项简表已替换。
 
@@ -50,7 +50,7 @@ bash scripts/setup.sh
 - 提供 `comic-economy` 生图档位：以角色参考和动作可读性为先，背景适度简化，适合连续分镜批量生产。
 - 知识卡、总结卡和 CTA 是按 brief 启用的可选收束镜头，不会自动追加到每个项目。
 
-新制作使用 `motion_plan` 0.3，其他合同保持 0.1；这是 V0.4 的兼容数据合同，不要把 Skill 发布版本和 JSON schema 版本混用。旧的 0.2 有限动画入口仍可读取，迁移规则见 [有限动画协议](references/limited-animation.md)。library 示例保留为回归测试；运行 `python scripts/make_acting_fixture.py ../acting-fixture` 生成明确标记为 legacy 0.2 的固定相机测试，正式项目应使用 0.3 合同。它验证执行能力，不代表正式美术质量。
+新制作使用 `motion_plan` 0.3，其他合同保持 0.1；这些是 V1.0 工作流的数据合同版本，不是 Skill 发布版本。旧的 0.2 有限动画入口仍可读取，迁移规则见 [有限动画协议](references/limited-animation.md)。library 示例保留为回归测试；运行 `python scripts/make_acting_fixture.py ../acting-fixture` 生成明确标记为 legacy 0.2 的固定相机测试，正式项目应使用 0.3 合同。它验证执行能力，不代表正式美术质量。
 
 ## 快速验证
 
@@ -93,6 +93,6 @@ SKILL.md                 Agent Skill 正式工作协议
 
 ## 长期维护方向
 
-下一阶段优先补齐可检查的头部/手部/道具局部表演、声音与停顿质量、完整短话镜头覆盖和可追溯视觉复核。具体边界见 [V0.5 优化路线](references/v05-roadmap.md)。任何扩展都应保持：用户原文不被改题材、角色参考不锁镜头姿势、master 是图层对齐的唯一视觉基准。
+下一阶段优先补齐可检查的头部/手部/道具局部表演、声音与停顿质量、完整短话镜头覆盖和可追溯视觉复核。具体边界见 [后续优化路线](references/v05-roadmap.md)。任何扩展都应保持：用户原文不被改题材、角色参考不锁镜头姿势、master 是图层对齐的唯一视觉基准。
 
 开发规范、运行细节和已验证边界见 [SKILL.md](SKILL.md) 与 [验证记录](references/validation.md)。

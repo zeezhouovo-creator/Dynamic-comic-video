@@ -20,7 +20,7 @@ shots/shot_001/
   layers/rain.png         按需
 ```
 
-V0.1 层清单和运动元数据直接放在 storyboard.json / motion_plan.json，不另存重复的 shot.json。
+合同 0.1 的层清单和运动元数据直接放在 storyboard.json / motion_plan.json，不另存重复的 shot.json。
 
 ## 必须检查
 

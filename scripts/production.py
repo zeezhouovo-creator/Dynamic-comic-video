@@ -91,13 +91,13 @@ def check_direction(data):
     if data['motion_plan']['version']!='0.3': return [],[]
     errors=[]; warnings=[]; board=data['storyboard']; scenes=board.get('scenes',[])
     scene_ids={s['id'] for s in scenes}
-    if not scenes or len(scene_ids)!=len(scenes): errors.append('V0.3 requires unique scene space records')
+    if not scenes or len(scene_ids)!=len(scenes): errors.append('motion_plan 0.3 requires unique scene space records')
     for i,shot in enumerate(board['shots']):
         sid=shot['id']; d=shot.get('direction')
         if not d:
             errors.append('Missing independent shot direction '+sid); continue
         if not shot.get('source_panel'):
-            errors.append('V0.3 shot must identify source comic panel '+sid)
+            errors.append('motion_plan 0.3 shot must identify source comic panel '+sid)
         if d['scene_id'] not in scene_ids: errors.append('Unknown scene '+sid)
         next_id=board['shots'][i+1]['id'] if i+1<len(board['shots']) else None
         if d['next_shot_id']!=next_id: errors.append('Next shot continuity link mismatch '+sid)

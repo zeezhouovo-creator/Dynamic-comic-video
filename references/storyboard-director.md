@@ -48,7 +48,7 @@
 下一镜头衔接：
 ```
 
-V0.3 要求 scenes 与每镜 direction。基础角色 action/expression/gaze 和 dialogue 继续使用现有字段，避免复制两份台词或时间轴。compile 将这些结构化字段输出为完整 storyboard_review.md；同时向逐镜 master/acting 提示词传入场景空间和相邻镜头承接信息。
+`motion_plan` 0.3 要求 scenes 与每镜 direction。基础角色 action/expression/gaze 和 dialogue 继续使用现有字段，避免复制两份台词或时间轴。compile 将这些结构化字段输出为完整 storyboard_review.md；同时向逐镜 master/acting 提示词传入场景空间和相邻镜头承接信息。
 
 ## 验收
 

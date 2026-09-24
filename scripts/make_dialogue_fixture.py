@@ -1,4 +1,4 @@
-"""Public V0.3 audio/mouth fixture; synthetic test tone, not voice acting."""
+"""Synthetic motion_plan 0.3 audio/mouth fixture; not voice acting."""
 import math
 import struct
 import sys

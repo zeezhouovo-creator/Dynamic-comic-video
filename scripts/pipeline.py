@@ -1,4 +1,4 @@
-"""Local-only V0.1 contract validation, prompt compiler and renderer preparation."""
+"""Local-only contract validation, prompt compiler and renderer preparation."""
 import argparse
 import hashlib
 import json
@@ -91,7 +91,7 @@ def validate(project, assets=False, shot_id=None):
         if item['duration_frames']!=shot['duration_frames']: errors.append('Duration mismatch '+sid)
         sequential=(item.get('performance') or {}).get('mode')=='sequential-comic'
         if motion['version']=='0.3' and (item.get('performance') or {}).get('mode') not in ('sequential-comic','fixed-camera-micro'):
-            errors.append('V0.3 requires a fixed comic performance mode '+sid)
+            errors.append('motion_plan 0.3 requires a fixed comic performance mode '+sid)
         if sequential and ('dialogue' not in shot or shot.get('transition')!='cut'):
             errors.append('Sequential comic requires dialogue (empty for silent shots) and cut transition '+sid)
         caption_end=0

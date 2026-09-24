@@ -3,9 +3,9 @@ name: dynamic-comic-video
 description: Create and revise sequential motion-comic videos from stories, scripts, character references, or independent panels. Use for dynamic comics, motion comics, 动态漫画, or 漫剧 with consistent characters, fixed-camera local acting, timed audio/subtitles, and Remotion MP4 output. Not for generic slideshows, full frame-by-frame animation, or phoneme lip sync.
 ---
 
-# Dynamic Comic Video — V1.0 candidate
+# Dynamic Comic Video — V1.0 workflow
 
-将用户内容制作成连续分镜式动态漫画：剧情决定分镜，事件触发人物表演，实际声音决定时间，硬切推进叙事。V1.0 是总控候选层，V0.4 是现有执行层；两者都不是 JSON schema 版本。
+将用户内容制作成连续分镜式动态漫画：剧情决定分镜，事件触发人物表演，实际声音决定时间，硬切推进叙事。当前对外版本是 V1.0；历史文档中的 V0.4 只表示这套工作流早期的执行闭环，已经纳入 V1.0，不是另一套运行模式或产品版本。
 
 ## 入口与按需加载
 
@@ -25,7 +25,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.3"`，其余三份制作合同为 `"0.1"`；旧 0.2 动作按有限动画协议兼容，不因 Skill 升级批量改版本。
 
-条件模块：选择纸片拼贴时读 [画风预设](references/paper-collage-style.md)；明确固定机位微动作时读 [微动作模式](references/fixed-camera-micro.md)；要求知识卡、总结卡或 CTA 时读 [收束卡](references/outro-card.md)。发布验收才读 [V0.4 验收](references/v04-production.md)，规划能力扩展才读 [路线图](references/v05-roadmap.md)。
+条件模块：选择纸片拼贴时读 [画风预设](references/paper-collage-style.md)；明确固定机位微动作时读 [微动作模式](references/fixed-camera-micro.md)；要求知识卡、总结卡或 CTA 时读 [收束卡](references/outro-card.md)。发布验收才读 [制作闭环与验收](references/v04-production.md)，规划能力扩展才读 [后续优化路线](references/v05-roadmap.md)。
 
 ## 全程保持的创作约束
 

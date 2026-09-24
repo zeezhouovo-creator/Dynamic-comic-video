@@ -9,7 +9,7 @@
 | storyboard.json | beats 原文摘录/变化/情绪；shots 动作、表情、机位、构图、连续性、master、layers | 编译器、分层、QC |
 | motion_plan.json | asset_mode、逐镜起始帧/时长、逐层变换/z、review | 素材 QC、Remotion |
 
-Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。Narrative Beats 内嵌于 storyboard，V0.1 不另增第五个必须文件。Visual Brief 内嵌于 production brief，保持风格与内容设定分离。
+Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。Narrative Beats 内嵌于 storyboard，合同 0.1 不另增第五个必须文件。Visual Brief 内嵌于 production brief，保持风格与内容设定分离。
 
 ## 单位与路径
 
@@ -17,7 +17,7 @@ Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。
 - asset/master/reference 路径相对生产项目根；只能本地相对路径，不能 URL、绝对路径、`..` 或反斜杠。准备渲染时仅复制使用的层到 renderer/public。
 - 全图层与 master 同尺寸；人物 PNG 保留全画布透明区域，不使用紧裁 bbox。中心为变换原点，x/y 为输出画布像素，scale 为统一缩放倍率。from 是镜头首帧，to 是末帧。
 - z 越大越靠前且不得相同。background 必須唯一且最底层，其他层按实际遮挡排列。人物持有的纸条等刚性随身物可归到人物层；独立运动时才另拆。
-- 旧 V0.1 线性变换路径使用 scale 1–1.3 并检查两端画布覆盖；这不是新项目的镜头运动许可。新项目依 [连续分镜模式](sequential-comic.md) 保持固定机位，局部部件关键帧与姿态切换依 [有限动画协议](limited-animation.md) 编写，实际遮挡和中间帧仍需目视复核。
+- 旧合同 0.1 的线性变换路径使用 scale 1–1.3 并检查两端画布覆盖；这不是新项目的镜头运动许可。新项目依 [连续分镜模式](sequential-comic.md) 保持固定机位，局部部件关键帧与姿态切换依 [有限动画协议](limited-animation.md) 编写，实际遮挡和中间帧仍需目视复核。
 - `render_profile` 只控制生图细节预算：`comic-economy` 优先清晰线条、角色身份和动作可读性，`standard` 保持均衡，`high-detail` 仅在用户明确要求时使用。它不改变题材、地域、时代或叙事目的。
 
 ## 状态与检查边界

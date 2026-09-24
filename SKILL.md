@@ -50,7 +50,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 5. 多镜头返工使用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录；处理后更新为 `resolved`。需要只重做变更镜头时使用 `scripts/preview.py <project> --renderer <external-renderer> --incremental`，它只更新指纹变化或缓存缺失的镜头。
 6. 新机器或 renderer 变更后先运行 `python scripts/doctor.py`；它只检查本地环境，不安装依赖、不上传项目和密钥。
 7. 视觉复核批准且返工台账清空后运行 `python scripts/deliver.py <project>`；交付闸门会用本地 `ffprobe` 验证 MP4 的可播放性、尺寸、帧率和时长，并把结果写入 `delivery_report.json`。报告为 `FAIL` 时按 `blocking_issues` 修复。
-8. 选择 `style_preset: "simple-comic"` 做图片优先试片时，先用 `scripts/generate_simple_comic_motion_assets.py <project>` 生成明确标注的眨眼/张嘴变体，再用 `scripts/preview.py <project> --simple-comic` 渲染。没有变体时仍可出静态预览，但不能声称包含眼睛或嘴部表演。
+8. 选择 `style_preset: "simple-comic"` 做图片优先试片时，先用 `scripts/generate_simple_comic_motion_assets.py <project>` 生成明确标注的眨眼和源图嘴型变体，再用 `scripts/preview.py <project> --simple-comic` 渲染。没有变体时仍可出静态预览，但不能声称包含眼睛或嘴部表演；未经对齐审核的通用嘴型不得覆盖 master。
 5. 重复检查包括相邻 pose_tag、连续三镜景别/角度/构图标签和人物 PNG 哈希。标签或哈希不同不证明画面不同；合理重复写明 `repetition_exception`，不能改标签掩盖固定立绘复用。
 6. 交付说明实际完成阶段、测试/正式素材状态、时长、尺寸、输出绝对路径与剩余问题。只通过校验不能声称已渲染；存在 MP4 也不等于完成视觉验收。
 

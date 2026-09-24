@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from generate_simple_comic_motion_assets import _box
+from generate_simple_comic_motion_assets import _box, _mouth_open
 from render_simple_comic_preview import _ass_time, _load_motion, _resolve_variant
 
 
@@ -32,6 +32,14 @@ class SimpleComicRendererTests(unittest.TestCase):
             target.parent.mkdir(parents=True)
             target.write_bytes(b"png")
             self.assertEqual(_resolve_variant(project, target.relative_to(project).as_posix()), target)
+
+    def test_open_mouth_variant_preserves_approved_master(self):
+        import numpy as np
+
+        master = np.zeros((8, 12, 3), dtype=np.uint8)
+        master[3:5, 4:8] = (17, 29, 41)
+        variant = _mouth_open(master, [{"mouth": [0.3, 0.3, 0.2, 0.2]}], 12, 8)
+        self.assertTrue(np.array_equal(variant, master))
 
 
 if __name__ == "__main__":

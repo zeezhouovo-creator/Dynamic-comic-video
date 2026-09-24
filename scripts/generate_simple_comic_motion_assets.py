@@ -1,4 +1,4 @@
-"""Create small aligned eye-blink and mouth-open variants for simple-comic masters.
+"""Create aligned eye-blink and source-mouth variants for simple-comic masters.
 
 The operation is local and deterministic.  It only edits the supplied face
 regions and writes variants next to each master; it does not upload artwork or
@@ -36,16 +36,6 @@ def _skin_color(image: np.ndarray, box: tuple[int, int, int, int]) -> tuple[int,
     return tuple(int(value) for value in np.median(sample, axis=0))
 
 
-def _inpaint(image: np.ndarray, regions: list[list[float]], width: int, height: int) -> np.ndarray:
-    mask = np.zeros((height, width), dtype=np.uint8)
-    for region in regions:
-        left, top, right, bottom = _box(region, width, height)
-        center = ((left + right) // 2, (top + bottom) // 2)
-        axes = (max(2, (right - left) // 2), max(2, (bottom - top) // 2))
-        cv2.ellipse(mask, center, axes, 0, 0, 360, 255, -1)
-    return cv2.inpaint(image, mask, 3, cv2.INPAINT_TELEA)
-
-
 def _blink(image: np.ndarray, faces: list[dict], width: int, height: int) -> np.ndarray:
     eyes = [region for face in faces for region in face.get("eyes", [])]
     result = image.copy()
@@ -59,25 +49,17 @@ def _blink(image: np.ndarray, faces: list[dict], width: int, height: int) -> np.
 
 
 def _mouth_open(image: np.ndarray, faces: list[dict], width: int, height: int) -> np.ndarray:
-    mouths = [face.get("mouth") for face in faces if face.get("mouth")]
-    result = _inpaint(image, mouths, width, height)
-    for region in mouths:
-        left, top, right, bottom = _box(region, width, height)
-        center = ((left + right) // 2, (top + bottom) // 2)
-        axes = (max(3, round((right - left) * 0.20)), max(3, round((bottom - top) * 0.22)))
-        cv2.ellipse(result, center, axes, 0, 0, 360, (42, 28, 34), -1)
-        tongue_center = (center[0], center[1] + max(1, axes[1] // 3))
-        cv2.ellipse(
-            result,
-            tongue_center,
-            (max(2, axes[0] // 2), max(1, axes[1] // 4)),
-            0,
-            0,
-            180,
-            (112, 102, 196),
-            -1,
-        )
-    return result
+    """Keep the source-drawn mouth aligned with the approved master.
+
+    Earlier versions painted a generic dark ellipse over the configured
+    region. Because generated faces are not perfectly aligned to the
+    normalized boxes, that could leave an offset oval and a partial copy of
+    the original mouth. The master already contains a style-consistent
+    speaking expression, so it is the safest open-mouth variant until an
+    explicitly aligned asset is supplied.
+    """
+    del faces, width, height
+    return image.copy()
 
 
 def generate(project: Path, config_path: Path) -> dict:

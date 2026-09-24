@@ -95,7 +95,7 @@ python scripts/generate_simple_comic_motion_assets.py <独立项目目录>
 python scripts/preview.py <独立项目目录> --simple-comic
 ```
 
-这条路径保持 master 不变，只在明确的帧切换眨眼和张嘴图片；它不加入镜头推拉，也不把静态图片误报成动态表演。变体由本地 OpenCV 生成，项目素材和密钥不会上传。
+这条路径保持 master 不变，只在明确的帧切换眨眼和源图嘴型；它不加入镜头推拉，也不把静态图片误报成动态表演。眨眼由本地 OpenCV 生成，嘴型变体默认保留 master 自带的自然表情，避免错位的通用椭圆覆盖人物原嘴型。项目素材和密钥不会上传。
 
 视觉复核批准后运行 `python scripts/deliver.py <独立项目目录>`。只有 `delivery_report.json` 的 `status` 为 `PASS` 才算机器检查通过；`ffprobe` 必须在本机 PATH 中。该闸门只读本地文件，不安装依赖、不上传项目或密钥。
 

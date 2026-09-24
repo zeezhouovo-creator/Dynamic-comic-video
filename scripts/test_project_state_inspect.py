@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from project_state import inspect
+from project_state import file_sha256, inspect, review, source_fingerprint
 
 
 class ProjectStateInspectTests(unittest.TestCase):
@@ -68,6 +68,54 @@ class ProjectStateInspectTests(unittest.TestCase):
         self.assertEqual(result["suggested_state"], "PREVIEW")
         self.assertIn("review frame not checked: s1 first", result["missing"])
         self.assertIn("visual_review.json review_status=approved", result["missing"])
+
+    def seed_review_project(self):
+        self.seed_ready_project()
+        self.write("quality_report.json", {"status": "PASS"})
+        (self.project / "preview.mp4").write_bytes(b"preview")
+        (self.project / "visual-review").mkdir()
+        image = self.project / "visual-review" / "s1_first.png"
+        image.write_bytes(b"frame")
+        self.write("visual_review.json", {
+            "version": "0.1",
+            "preview": "preview.mp4",
+            "preview_sha256": file_sha256(self.project / "preview.mp4"),
+            "source_fingerprint": source_fingerprint(self.project),
+            "frames": [{
+                "shot_id": "s1", "position": "first", "image": "visual-review/s1_first.png",
+                "sha256": file_sha256(image), "reviewed": False,
+            }],
+            "review_status": "pending",
+        })
+
+    def test_approve_review_updates_all_frames(self):
+        self.seed_review_project()
+        result = review(self.project, approved=True, note="已查看", reviewer="tester")
+        self.assertEqual(result["review_status"], "approved")
+        self.assertTrue(result["frames"][0]["reviewed"])
+        self.assertEqual(result["reviewer"], "tester")
+        self.assertEqual(inspect(self.project)["suggested_state"], "PREVIEW")
+
+    def test_rejected_review_routes_to_revision(self):
+        self.seed_review_project()
+        review(self.project, note="shot_001 接缝明显")
+        result = inspect(self.project)
+        self.assertEqual(result["suggested_state"], "REVISION")
+        self.assertEqual(result["missing"], ["shot_001 接缝明显"])
+
+    def test_approval_refuses_stale_source(self):
+        self.seed_review_project()
+        self.write("storyboard.json", {"shots": [{"id": "s1", "direction": {"scene_id": "changed"}}]})
+        with self.assertRaisesRegex(ValueError, "stale"):
+            review(self.project, approved=True)
+
+    def test_approved_review_becomes_stale_after_source_edit(self):
+        self.seed_review_project()
+        review(self.project, approved=True)
+        self.write("motion_plan.json", {"asset_mode": "fixture", "shots": [{"shot_id": "s1", "changed": True}]})
+        result = inspect(self.project)
+        self.assertEqual(result["suggested_state"], "PREVIEW")
+        self.assertIn("visual review source fingerprint is stale", result["missing"])
 
     def test_malformed_evidence_is_reported_instead_of_crashing(self):
         self.seed_ready_project()

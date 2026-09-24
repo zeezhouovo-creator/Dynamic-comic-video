@@ -44,7 +44,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 1. 完成当前阶段的数据与资产，再运行 `scripts/pipeline.py validate <project>` 和 `compile <project>`；compile 整理导演决策，不替代剧情设计或图像生成。
 2. 核对角色、master、图层及实际运动范围后才填写 `ready`、`review` 或 `performance.reviewed`。fixture 只用于管线测试，不得改标签冒充正式素材。
 3. 预览可用 `scripts/preview.py <project> --renderer <external-renderer>`；单镜头可追加 `--shot <shot_id>`，输出默认为 `preview_<shot_id>.mp4`。流程执行素材校验、质量闸门安全修正、再校验、编译、prepare 和 Remotion 渲染；首次安装 renderer 依赖才追加 `--npm-install`。每次预览还会把首/中/末帧复制到 `<project>/visual-review/`，并写入 `visual_review.json`。
-4. Critical/Major 问题修复后才进入预览。自动闸门只验证可计算条件；打开 `visual_review.json` 中的图片，查看逐镜接触表、关键帧及中间帧、切点两侧，检查身份、接缝、接触、遮挡、字幕与节奏。按叙事需要保留反应时间；`reviewed` 必须在实际查看后填写。
+4. Critical/Major 问题修复后才进入预览。自动闸门只验证可计算条件；打开 `visual_review.json` 中的图片，查看逐镜接触表、关键帧及中间帧、切点两侧，检查身份、接缝、接触、遮挡、字幕与节奏。按叙事需要保留反应时间；实际查看后使用 `python scripts/project_state.py review <project> --approve`，发现问题使用 `--reject --note`。复核清单绑定当前源文件和媒体指纹，修改输入后必须重新预览。
 5. 重复检查包括相邻 pose_tag、连续三镜景别/角度/构图标签和人物 PNG 哈希。标签或哈希不同不证明画面不同；合理重复写明 `repetition_exception`，不能改标签掩盖固定立绘复用。
 6. 交付说明实际完成阶段、测试/正式素材状态、时长、尺寸、输出绝对路径与剩余问题。只通过校验不能声称已渲染；存在 MP4 也不等于完成视觉验收。
 

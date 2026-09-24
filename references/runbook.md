@@ -46,7 +46,7 @@ python scripts/preview.py ..\extended-acting-fixture --renderer ..\extended-acti
 python scripts/preview.py <project> --renderer <project-outside-renderer>
 ```
 
-脚本会先重新校验素材、运行质量闸门，再编译、prepare、渲染，并把 `renderer/out/video.mp4` 复制为 `<project>/preview.mp4`，同时把首/中/末帧复制到 `<project>/visual-review/` 并写入 `visual_review.json`。只预览单镜头时追加 `--shot shot_002`；首次使用该 renderer 时增加 `--npm-install`。它不会上传项目文件，也不会读取或写入 API Key。
+脚本会先重新校验素材、运行质量闸门，再编译、prepare、渲染，并把 `renderer/out/video.mp4` 复制为 `<project>/preview.mp4`，同时把首/中/末帧复制到 `<project>/visual-review/` 并写入带指纹的 `visual_review.json`。打开这些帧完成检查后，运行 `python scripts/project_state.py review <project> --approve`；发现问题运行 `--reject --note "..."`。只预览单镜头时追加 `--shot shot_002`；首次使用该 renderer 时增加 `--npm-install`。它不会上传项目文件，也不会读取或写入 API Key。
 
 不要把 private 配置放入 renderer/public。prepare 不拷贝 `.env`、原文或 reference 到 public，仅拷贝渲染层和必要的运动元数据。
 

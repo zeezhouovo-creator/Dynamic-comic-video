@@ -90,8 +90,12 @@ class PreviewTests(unittest.TestCase):
                 destination = run_preview(project, renderer, shot="shot/001")
             self.assertEqual(destination, project / "preview_shot_001.mp4")
             manifest = json.loads((project / "visual_review.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["version"], "0.2")
             self.assertEqual(manifest["scope"]["shot"], "shot/001")
             self.assertEqual(len(manifest["frames"]), 3)
+            self.assertTrue(manifest["source_fingerprint"])
+            self.assertTrue(manifest["preview_sha256"])
+            self.assertTrue(all(frame["sha256"] for frame in manifest["frames"]))
             self.assertTrue(all(not frame["reviewed"] for frame in manifest["frames"]))
             self.assertEqual(run.call_count, len(steps(project, renderer, shot="shot/001", stills=review_points(project, "shot/001"))))
 

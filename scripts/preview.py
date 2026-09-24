@@ -12,6 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from project_state import file_sha256, source_fingerprint
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -125,11 +127,18 @@ def run_preview(project, renderer, output=None, install=False, shot=None):
                 "frame": point["frame"],
                 "global_frame": point["global_frame"],
                 "image": relative.as_posix(),
+                "sha256": file_sha256(project / relative),
                 "reviewed": False,
             })
+        try:
+            preview_reference = destination.relative_to(project).as_posix()
+        except ValueError:
+            preview_reference = str(destination)
         (project / "visual_review.json").write_text(json.dumps({
-            "version": "0.1",
-            "preview": destination.name,
+            "version": "0.2",
+            "preview": preview_reference,
+            "preview_sha256": file_sha256(destination),
+            "source_fingerprint": source_fingerprint(project),
             "scope": {"shot": shot, "full_project": shot is None},
             "frames": frames,
             "review_status": "pending",

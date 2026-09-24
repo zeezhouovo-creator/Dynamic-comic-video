@@ -43,10 +43,12 @@ class DocumentationTests(unittest.TestCase):
         skill = read("SKILL.md")
         runbook = read("references/runbook.md")
         quality = read("references/quality-gate.md")
+        state = read("references/project-state.md")
         self.assertIn("--shot <shot_id>", skill)
         self.assertIn("visual_review.json", skill)
         self.assertIn("--shot shot_002", runbook)
         self.assertIn("visual-review/", quality)
+        self.assertIn("review <project> --approve", state)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 """Persist and route the V1.0 dynamic-comic project state machine."""
 import argparse
+import datetime
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -31,6 +33,15 @@ FEEDBACK_ROUTES = (
     (("太赶", "太拖", "节奏", "停顿"), "QUALITY_CHECK", "timing_and_cut"),
 )
 
+FINGERPRINT_FILES = (
+    "production_brief.json",
+    "characters.json",
+    "storyboard.json",
+    "motion_plan.json",
+    "asset_report.json",
+    "quality_report.json",
+)
+
 
 def state_path(project):
     return Path(project).resolve() / "project_state.json"
@@ -38,6 +49,29 @@ def state_path(project):
 
 def read(path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def source_fingerprint(project):
+    """Hash the production inputs that make a preview reviewable."""
+    root = Path(project).resolve()
+    digest = hashlib.sha256()
+    for name in FINGERPRINT_FILES:
+        path = root / name
+        digest.update(name.encode("utf-8"))
+        if path.is_file():
+            digest.update(bytes((0,)))
+            digest.update(path.read_bytes())
+        else:
+            digest.update(bytes((1,)))
+    return digest.hexdigest()
 
 
 def write(path, value):
@@ -79,6 +113,90 @@ def route_feedback(text):
     return {"state": "REVISION", "module": "manual_review", "text": text}
 
 
+def _resolve_preview_reference(root, reference):
+    try:
+        path = Path(reference)
+    except (TypeError, ValueError):
+        return None
+    return path.resolve() if path.is_absolute() else (root / path).resolve()
+
+
+def _safe_review_image(root, reference):
+    try:
+        path = (root / Path(reference)).resolve()
+        path.relative_to(root)
+        return path
+    except (OSError, TypeError, ValueError):
+        return None
+
+
+def _read_visual_review(review_path):
+    try:
+        data = read(review_path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _visual_review_freshness_issues(root, data):
+    """Check that a review manifest still points at the current local artifacts."""
+    issues = []
+    if data.get("source_fingerprint") != source_fingerprint(root):
+        issues.append("visual review source fingerprint is stale")
+    preview_reference = data.get("preview")
+    preview_path = _resolve_preview_reference(root, preview_reference) if preview_reference else None
+    if preview_path is None or not preview_path.is_file():
+        issues.append("visual review preview file")
+    elif data.get("preview_sha256") != file_sha256(preview_path):
+        issues.append("visual review preview fingerprint is stale")
+    frames = data.get("frames")
+    if not isinstance(frames, list) or not frames:
+        issues.append("visual review frames")
+        return issues
+    for frame in frames:
+        if not isinstance(frame, dict) or not frame.get("image"):
+            issues.append("valid visual review frame entries")
+            continue
+        image_path = _safe_review_image(root, frame["image"])
+        if image_path is None:
+            issues.append(f"safe visual review image path: {frame.get('image')}")
+        elif not image_path.is_file():
+            issues.append(f"visual review image: {frame['image']}")
+        elif frame.get("sha256") != file_sha256(image_path):
+            issues.append(f"visual review frame fingerprint is stale: {frame.get('shot_id', '?')} {frame.get('position', '?')}")
+    return issues
+
+
+def review(project, approved=False, note=None, reviewer=None):
+    """Record a human visual-review decision for the current preview."""
+    root = Path(project).resolve()
+    path = root / "visual_review.json"
+    if not path.is_file():
+        raise ValueError(f"Missing visual review manifest: {path}")
+    data = _read_visual_review(path)
+    if data is None:
+        raise ValueError("visual_review.json must contain a JSON object")
+    if approved:
+        freshness = _visual_review_freshness_issues(root, data)
+        if freshness:
+            raise ValueError("Cannot approve stale visual review: " + "; ".join(freshness))
+        for frame in data["frames"]:
+            frame["reviewed"] = True
+        data["review_status"] = "approved"
+    else:
+        data["review_status"] = "rejected"
+        for frame in data.get("frames", []):
+            if isinstance(frame, dict):
+                frame["reviewed"] = False
+    if note:
+        data["review_notes"] = note
+    data["reviewed_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    if reviewer:
+        data["reviewer"] = reviewer
+    write(path, data)
+    return data
+
+
 def _asset_report_issues(root, report_path):
     """Return machine-checkable asset report issues without trusting its summary."""
     if not report_path.is_file():
@@ -111,41 +229,26 @@ def _asset_report_issues(root, report_path):
     return data, issues
 
 
-def _visual_review_issues(root, review_path, preview_path):
+def _visual_review_issues(root, review_path, preview_path=None, data=None):
     """Check that the generated visual review manifest still matches the preview."""
     if not review_path.is_file():
         return ["visual_review.json"]
-    try:
-        data = read(review_path)
-    except (OSError, ValueError, json.JSONDecodeError):
+    data = data if data is not None else _read_visual_review(review_path)
+    if data is None:
         return ["valid visual_review.json"]
-    if not isinstance(data, dict):
-        return ["valid visual_review.json"]
-    issues = []
-    if not isinstance(data.get("frames"), list) or not data["frames"]:
-        issues.append("visual review frames")
-    else:
-        for frame in data["frames"]:
-            if not isinstance(frame, dict) or not frame.get("image"):
-                issues.append("valid visual review frame entries")
-                continue
-            image = Path(frame["image"])
-            try:
-                image_path = (root / image).resolve()
-                image_path.relative_to(root)
-            except (OSError, TypeError, ValueError):
-                issues.append(f"safe visual review image path: {frame.get('image')}")
-                continue
-            if not image_path.is_file():
-                issues.append(f"visual review image: {frame['image']}")
-            if not frame.get("reviewed"):
-                issues.append(f"review frame not checked: {frame.get('shot_id', '?')} {frame.get('position', '?')}")
+    issues = _visual_review_freshness_issues(root, data)
     if not data.get("preview"):
         issues.append("visual review preview reference")
+    if isinstance(data.get("frames"), list):
+        for frame in data["frames"]:
+            if isinstance(frame, dict) and not frame.get("reviewed"):
+                issues.append(f"review frame not checked: {frame.get('shot_id', '?')} {frame.get('position', '?')}")
     if data.get("review_status") != "approved":
         issues.append("visual_review.json review_status=approved")
-    if preview_path and data.get("preview") and data["preview"] != preview_path.name:
-        issues.append("visual review matches current preview")
+    if preview_path and data.get("preview"):
+        referenced = _resolve_preview_reference(root, data["preview"])
+        if referenced is not None and referenced != preview_path.resolve():
+            issues.append("visual review matches current preview")
     return issues
 
 
@@ -249,8 +352,20 @@ def inspect(project):
     if not previews:
         return {"suggested_state": "COMPOSITION", "confidence": "medium", "evidence": evidence, "missing": ["preview MP4"]}
     evidence.append("preview MP4")
-    current_preview = next((path for path in previews if path.parent == root), None)
-    review_issues = _visual_review_issues(root, visual_review, current_preview)
+    review_data = _read_visual_review(visual_review) if visual_review.is_file() else None
+    current_preview = None
+    if review_data and review_data.get("preview"):
+        referenced = _resolve_preview_reference(root, review_data["preview"])
+        if referenced and referenced.is_file():
+            current_preview = referenced
+    if current_preview is None:
+        current_preview = next((path for path in previews if path.parent == root), None)
+    if review_data and review_data.get("review_status") in ("rejected", "changes_requested"):
+        note = review_data.get("review_notes") or "visual review rejected"
+        if visual_review.is_file():
+            evidence.append("visual_review.json")
+        return {"suggested_state": "REVISION", "confidence": "high", "evidence": evidence, "missing": [note]}
+    review_issues = _visual_review_issues(root, visual_review, current_preview, review_data)
     if review_issues:
         if visual_review.is_file():
             evidence.append("visual_review.json")
@@ -276,6 +391,13 @@ def main():
     p_transition.add_argument("--pending", nargs="*", default=None)
     p_feedback = sub.add_parser("route-feedback")
     p_feedback.add_argument("text")
+    p_review = sub.add_parser("review")
+    p_review.add_argument("project", type=Path)
+    review_group = p_review.add_mutually_exclusive_group(required=True)
+    review_group.add_argument("--approve", action="store_true")
+    review_group.add_argument("--reject", action="store_true")
+    p_review.add_argument("--note")
+    p_review.add_argument("--reviewer")
     p_inspect = sub.add_parser("inspect")
     p_inspect.add_argument("project", type=Path)
     args = parser.parse_args()
@@ -287,6 +409,8 @@ def main():
         value = transition(args.project, args.state, args.reason, args.pending)
     elif args.command == "route-feedback":
         value = route_feedback(args.text)
+    elif args.command == "review":
+        value = review(args.project, approved=args.approve, note=args.note, reviewer=args.reviewer)
     else:
         value = inspect(args.project)
     print(json.dumps(value, ensure_ascii=False, indent=2))
